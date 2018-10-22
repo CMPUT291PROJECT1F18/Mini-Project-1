@@ -13,7 +13,7 @@ from setuptools.command.test import test
 
 
 def find_version(*file_paths):
-    with codecs.open(os.path.join(os.path.abspath(os.path.dirname(__file__)), *file_paths), 'r') as fp:
+    with codecs.open(os.path.join(os.path.abspath(os.path.dirname(__file__)), *file_paths), "r") as fp:
         version_file = fp.read()
     m = re.search(r"^__version__ = \((\d+), ?(\d+), ?(\d+)\)", version_file, re.M)
     if m:
@@ -31,7 +31,7 @@ class Pylint(test):
 
 
 class PyTest(test):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
+    user_options = [("pytest-args=", "a", "Arguments to pass to pytest")]
 
     def initialize_options(self):
         test.initialize_options(self)
@@ -46,15 +46,15 @@ class PyTest(test):
 
 
 setup(
-    name='mini-project-1',
+    name="mini-project-1",
     version=VERSION,
     description="",
-    long_description=open('README.rst').read(),
+    long_description=open("README.rst").read(),
     keywords="",
-    author="",
-    author_email="",
-    url='https://github.com/CMPUT291PROJECT1F18/Mini-Project-1',
-    license='MIT License',
+    author="Nathan Klapstein",
+    author_email="nklapste@ualberta.ca",
+    url="https://github.com/CMPUT291PROJECT1F18/Mini-Project-1",
+    license="MIT License",
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
@@ -65,8 +65,8 @@ setup(
         "pylint>=1.9.1,<2.0.0",
     ],
     classifiers=[
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3'
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3"
     ],
     cmdclass={"test": PyTest, "lint": Pylint},
 )
