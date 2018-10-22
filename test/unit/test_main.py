@@ -11,7 +11,3 @@ import pytest
 def test_get_parser():
     parser = get_parser()
     assert parser
-
-
-def test_main():
-    main([])
