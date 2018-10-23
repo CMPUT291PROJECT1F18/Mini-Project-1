@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""argparse script for mini-project-1"""
+"""argparse and entry point script for mini-project-1"""
 
 import argparse
 import sys
@@ -18,7 +18,7 @@ def get_parser():
 
 
 def main(argv=sys.argv[1:]):
-    """argparse function for mini-project-1"""
+    """main entry point mini-project-1"""
     parser = get_parser()
     args = parser.parse_args(argv)
     # TODO: possibly add different startup arguments
