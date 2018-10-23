@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""unit tests for __main__.py"""
+"""pytests for :mod:`__main__`"""
 
 from mini_project_1.__main__ import get_parser, main
 
