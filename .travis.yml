@@ -28,6 +28,6 @@ jobs:
     - script:
       - python setup.py sdist
       name: "build"
-    - stage: deploy
-      script:
+    - script:
       - sphinx-build docs/ build/
+      name: "docs"
