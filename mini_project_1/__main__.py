@@ -51,7 +51,7 @@ def main(argv=sys.argv[1:]):
 
     # configure logging
     handlers_ = []
-    log_format = Formatter(fmt="%(asctime)s %(levelname)s %(message)s")
+    log_format = Formatter(fmt="[%(asctime)s][%(levelname)s] - %(message)s")
     if args.log_dir:
         os.makedirs(args.log_dir, exist_ok=True)
         file_handler = TimedRotatingFileHandler(
