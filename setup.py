@@ -27,7 +27,8 @@ VERSION = find_version("mini_project_1", "__init__.py")
 class Pylint(test):
     def run_tests(self):
         from pylint.lint import Run
-        Run(["mini_project_1", "--persistent", "y", "--rcfile", ".pylintrc"])
+        Run(["mini_project_1", "--persistent", "y", "--rcfile", ".pylintrc",
+             "--output-format", "colorized"])
 
 
 class PyTest(test):
