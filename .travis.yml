@@ -10,7 +10,7 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - pip install -e .["docs","tests"] -q
+  - pip install .["docs","tests"]
 
 stages:
   - test
