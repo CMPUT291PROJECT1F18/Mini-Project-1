@@ -5,4 +5,4 @@
 
 import pytest
 
-from mini_project_1.project_shell import ProjectShell
+from mini_project_1.shell import MiniProjectShell

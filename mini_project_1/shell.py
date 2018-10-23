@@ -8,7 +8,7 @@ from getpass import getpass
 from mini_project_1.member import Member
 
 
-class ProjectShell(cmd.Cmd):
+class MiniProjectShell(cmd.Cmd):
     """Main shell for mini-project-1"""
     intro = \
         """Welcome to mini-project-1 shell. Type help or ? to list commands\n"""
