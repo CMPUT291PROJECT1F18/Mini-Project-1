@@ -59,6 +59,11 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
+    entry_points={
+        "console_scripts": [
+            "mini-project-1 = mini_project_1.__main__:main"
+        ]
+    },
     extras_require={
         "docs": [
             "sphinx>=1.7.5,<2.0.0",
