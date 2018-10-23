@@ -3,6 +3,10 @@
 
 """Class representing a member"""
 
+from logging import getLogger
+
+__log__ = getLogger(__name__)
+
 
 class Member:
     """Class representing a member"""

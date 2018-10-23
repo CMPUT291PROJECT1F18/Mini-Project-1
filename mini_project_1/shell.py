@@ -5,7 +5,11 @@
 
 import cmd
 from getpass import getpass
+from logging import getLogger
+
 from mini_project_1.member import Member
+
+__log__ = getLogger(__name__)
 
 
 # TODO: maybe have a try catch structure for all commands invocation
@@ -34,7 +38,7 @@ class MiniProjectShell(cmd.Cmd):
         """Logout (if needed) and exit out of the mini-project-1 shell: exit"""
         if self.login_member:
             self.logout()
-        print("exiting mini-project-1 shell")
+        __log__.info("exiting mini-project-1 shell")
         return True
 
     def do_offer_ride(self, arg):
@@ -82,13 +86,13 @@ class MiniProjectShell(cmd.Cmd):
         if self.login_member:
             username = self.login_member.username
             self.login_member = None
-            print("logged out of: {}".format(username))
+            __log__.info("logging out user: {}".format(username))
         else:
             # TODO: possibly through error instead
-            print("ERROR: not logged in")
+            __log__.error("cannot logout not logged in")
 
     def login(self, username: str, password: str):
         """Login method"""
         # TODO: validate login
         self.login_member = Member(username, password)
-        print("logged in as: {}".format(username))
+        __log__.info("logged in user: {}".format(username))
