@@ -6,20 +6,28 @@ sudo: required
 language: python
 python: 3.6
 
-matrix:
-    include:
-        - python: 3.4
-          env: TOXENV=py34
-        - python: 3.5
-          env: TOXENV=py35
-        - python: 3.6
-          env: TOXENV=py36
-        - python: pypy
-          env: TOXENV=pypy
+before_install:
+  - pip install --upgrade pip
 
-before_install: 'pip install --upgrade pip'
+install:
+  - pip install -e .["docs","tests"] -q
 
-install: 'pip install tox'
+stages:
+  - test
+  - deploy
 
-script:
-    - 'tox'
+jobs:
+  include:
+    - stage: test
+      script:
+      - python setup.py test || if [ $? -eq 1 -o $? -eq 5 ]; then exit 0 ;  fi;
+      name: "test"
+    - script:
+      - python setup.py lint || exit $(($? & 35))
+      name: "lint"
+    - script:
+      - python setup.py sdist
+      name: "build"
+    - script:
+      - sphinx-build docs/ build/
+      name: "docs"
