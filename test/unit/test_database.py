@@ -8,7 +8,7 @@ import pytest
 
 DATABASE_DIR =os.path.join(
     os.path.dirname(os.path.realpath(__file__)),
-    'database',
+    'data',
     )
 
 DATABASE_TABLE_CREATE = os.path.join(DATABASE_DIR, "create_tables.sql")
@@ -36,6 +36,6 @@ def mock_db(tmpdir_factory):
 
 
 def test_example(mock_db):
-    """Test example for interacting with database mocks"""
+    """Test example for interacting with data mocks"""
     conn = sqlite3.connect(mock_db)
     print(conn.execute("""SELECT name FROM members""").fetchall())
