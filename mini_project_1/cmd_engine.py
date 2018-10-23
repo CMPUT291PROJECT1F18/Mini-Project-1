@@ -33,6 +33,42 @@ class ProjectShell(cmd.Cmd):
         print("exiting mini-project-1 shell")
         return sys.exit(0)
 
+    def do_offer_ride(self, arg):
+        """Offer a ride"""
+        # TODO:
+
+    def do_search_rides(self, arg):
+        """Search for ride"""
+        # TODO:
+
+    def do_post_ride_request(self, arg):
+        """Post a ride request"""
+        # TODO:
+
+    def do_list_bookings(self, arg):
+        """List all of your bookings you offer"""
+        # TODO:
+
+    def do_book_member(self, arg):
+        """Book other members on a ride"""
+        # TODO:
+
+    def do_cancel_booking(self, arg):
+        """Cancel a booking"""
+        # TODO:
+
+    def do_list_ride_requests(self, arg):
+        """List all of your ride requests"""
+        # TODO:
+
+    def do_search_ride_requests(self, arg):
+        """Search for a ride request"""
+        # TODO:
+
+    def do_delete_ride_request(self, arg):
+        """Delete a ride request"""
+        # TODO:
+
     def logout(self):
         """Logout method"""
         if self.login_member:
