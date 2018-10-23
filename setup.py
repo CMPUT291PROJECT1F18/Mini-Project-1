@@ -74,7 +74,6 @@ setup(
         "tests": [
             "pytest",
             "pytest-cov",
-            "pytest-timeout",
             "pylint>=1.9.1,<2.0.0",
         ]
     },
