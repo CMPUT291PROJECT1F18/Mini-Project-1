@@ -6,7 +6,7 @@
 import argparse
 import sys
 
-from mini_project_1.cmd_engine import ProjectShell
+from mini_project_1.project_shell import ProjectShell
 
 
 def get_parser():
