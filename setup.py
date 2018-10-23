@@ -63,6 +63,7 @@ setup(
         "pytest-cov",
         "pytest-timeout",
         "pylint>=1.9.1,<2.0.0",
+        "tox>=3.5.2"
     ],
     classifiers=[
         "License :: OSI Approved :: MIT License",
