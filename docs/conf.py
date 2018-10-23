@@ -132,7 +132,7 @@ intersphinx_mapping = {
 }
 
 
-# -- auto api doc generation --
+# -- auto api docs generation --
 def run_apidoc(_):
     from sphinx.ext.apidoc import main
     import os

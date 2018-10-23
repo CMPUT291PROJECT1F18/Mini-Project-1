@@ -30,4 +30,4 @@ jobs:
       name: "build"
     - stage: deploy
       script:
-      - sphinx-build doc/ build/
+      - sphinx-build docs/ build/
