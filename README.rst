@@ -26,7 +26,7 @@ Installation
 
 mini-project-1 can be installed from source by running:
 
-.. code-block::
+.. code-block:: bash
 
     pip install .
 
@@ -39,13 +39,13 @@ Usage
 After installing mini-project-1's shell can be started by the following console
 command:
 
-.. code-block::
+.. code-block:: bash
 
     mini-project-1
 
 To get additional usage help on mini-project-1 run the following console
 command:
 
-.. code-block::
+.. code-block:: bash
 
     mini-project-1 --help
