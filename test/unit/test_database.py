@@ -2,9 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """pytests interacting with databases for mini-project-1"""
-
+import os
 import sqlite3
 import pytest
+
+DATABASE_DIR =os.path.join(
+    os.path.dirname(os.path.realpath(__file__)),
+    'database',
+    )
+
+DATABASE_TABLE_CREATE = os.path.join(DATABASE_DIR, "create_tables.sql")
+DATABASE_DATA_CREATE = os.path.join(DATABASE_DIR, "create_data.sql")
 
 
 def create_test_db(filename: str):
@@ -12,9 +20,9 @@ def create_test_db(filename: str):
     conn = sqlite3.connect(filename)
     cursor = conn.cursor()
     # Create the tables
-    cursor.executescript(open("../create_tables.sql", "r").read())
+    cursor.executescript(open(DATABASE_TABLE_CREATE, "r").read())
     # Insert data
-    cursor.executescript(open("../test_data.sql", "r").read())
+    cursor.executescript(open(DATABASE_DATA_CREATE, "r").read())
     # Save (commit) the changes
     conn.commit()
 
