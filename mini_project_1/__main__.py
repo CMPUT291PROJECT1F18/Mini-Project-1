@@ -22,7 +22,8 @@ def main(argv=sys.argv[1:]):
     parser = get_parser()
     args = parser.parse_args(argv)
     # TODO possibly add different startup arguments
-    return ProjectShell().cmdloop()
+    ProjectShell().cmdloop()
+    return 0
 
 
 if __name__ == "__main__":

@@ -4,7 +4,6 @@
 """Main shell for mini-project-1"""
 
 import cmd
-import sys
 from getpass import getpass
 from mini_project_1.member import Member
 
@@ -31,7 +30,7 @@ class ProjectShell(cmd.Cmd):
         if self.login_member:
             self.logout()
         print("exiting mini-project-1 shell")
-        return sys.exit(0)
+        return True
 
     def do_offer_ride(self, arg):
         """Offer a ride"""
