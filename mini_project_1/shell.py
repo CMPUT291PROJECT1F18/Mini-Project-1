@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""Main shell for mini-project-1"""
+"""Main command shell for mini-project-1"""
 
 import cmd
 from getpass import getpass
