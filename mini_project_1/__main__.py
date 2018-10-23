@@ -73,7 +73,6 @@ def main(argv=sys.argv[1:]):
     )
 
     __log__.info("starting mini-project-1 shell")
-    # TODO: possibly add different startup arguments
     MiniProjectShell().cmdloop()
     return 0
 
