@@ -1,4 +1,4 @@
-Welcome to Mini-Project-1's documentation!
+Welcome to mini-project-1's documentation!
 ==========================================
 
 This code is open source, and is `available on GitHub`_.

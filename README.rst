@@ -1,5 +1,5 @@
 ##############
-Mini-Project-1
+mini-project-1
 ##############
 
 .. image:: https://travis-ci.org/CMPUT291PROJECT1F18/Mini-Project-1.svg?branch=master
