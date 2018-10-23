@@ -10,10 +10,11 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - pip install . -q
+  - pip install -e .["docs","tests"] -q
 
 stages:
   - test
+  - deploy
 
 jobs:
   include:
@@ -27,3 +28,6 @@ jobs:
     - script:
       - python setup.py sdist
       name: "build"
+    - stage: deploy
+      script:
+      - sphinx-build doc/ build/
