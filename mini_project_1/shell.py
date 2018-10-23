@@ -1,19 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""Main shell for mini-project-1"""
+"""Main command shell for mini-project-1"""
 
 import cmd
 from getpass import getpass
 from mini_project_1.member import Member
 
 
-class ProjectShell(cmd.Cmd):
+# TODO: maybe have a try catch structure for all commands invocation
+class MiniProjectShell(cmd.Cmd):
     """Main shell for mini-project-1"""
     intro = \
         """Welcome to mini-project-1 shell. Type help or ? to list commands\n"""
-    prompt = 'mini-project-1>'
+    prompt = "mini-project-1>"
     login_member: Member = None
+
+    # ===============================
+    # Shell command definitions
+    # ===============================
 
     def do_login(self, arg):
         """Login to the mini-project-1 database: login"""
@@ -68,6 +73,10 @@ class ProjectShell(cmd.Cmd):
         """Delete a ride request"""
         # TODO:
 
+    # ===============================
+    # Shell functionality definitions
+    # ===============================
+
     def logout(self):
         """Logout method"""
         if self.login_member:
@@ -75,6 +84,7 @@ class ProjectShell(cmd.Cmd):
             self.login_member = None
             print("logged out of: {}".format(username))
         else:
+            # TODO: possibly through error instead
             print("ERROR: not logged in")
 
     def login(self, username: str, password: str):

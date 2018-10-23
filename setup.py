@@ -51,14 +51,19 @@ setup(
     version=VERSION,
     description="",
     long_description=open("README.rst").read(),
-    keywords="",
-    author="Nathan Klapstein",
+    keywords="cmput291 project university",
+    author="Nathan Klapstein, Ryan Furrer, Thomas Lorincz",
     author_email="nklapste@ualberta.ca",
     url="https://github.com/CMPUT291PROJECT1F18/Mini-Project-1",
     license="MIT License",
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
+    entry_points={
+        "console_scripts": [
+            "mini-project-1 = mini_project_1.__main__:main"
+        ]
+    },
     extras_require={
         "docs": [
             "sphinx>=1.7.5,<2.0.0",
@@ -76,6 +81,7 @@ setup(
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3"
+        "Programming Language :: Python :: 3.6"
     ],
     cmdclass={"test": PyTest, "lint": Pylint},
 )
