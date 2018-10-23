@@ -41,10 +41,6 @@ class ProjectShell(cmd.Cmd):
         """Search for ride"""
         # TODO:
 
-    def do_post_ride_request(self, arg):
-        """Post a ride request"""
-        # TODO:
-
     def do_list_bookings(self, arg):
         """List all of your bookings you offer"""
         # TODO:
@@ -55,6 +51,10 @@ class ProjectShell(cmd.Cmd):
 
     def do_cancel_booking(self, arg):
         """Cancel a booking"""
+        # TODO:
+
+    def do_post_ride_request(self, arg):
+        """Post a ride request"""
         # TODO:
 
     def do_list_ride_requests(self, arg):
