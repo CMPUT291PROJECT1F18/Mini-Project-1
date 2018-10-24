@@ -1,2 +1,3 @@
 include LICENSE
 include README.rst
+include mini_project_1/data/*.sql
