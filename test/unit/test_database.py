@@ -6,9 +6,10 @@
 import os
 import sqlite3
 import pytest
+import mini_project_1
 
 DATABASE_DIR = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)),
+    os.path.dirname(os.path.realpath(mini_project_1.__file__)),
     "data",
 )
 
