@@ -4,9 +4,9 @@
 """Main command shell for mini-project-1"""
 
 import cmd
+import sqlite3
 from getpass import getpass
 from logging import getLogger
-
 from mini_project_1.member import Member
 
 __log__ = getLogger(__name__)
@@ -16,9 +16,18 @@ __log__ = getLogger(__name__)
 class MiniProjectShell(cmd.Cmd):
     """Main shell for mini-project-1"""
     intro = \
-        """Welcome to mini-project-1 shell. Type help or ? to list commands\n"""
+        "Welcome to mini-project-1 shell. Type help or ? to list commands\n"
     prompt = "mini-project-1>"
     login_member: Member = None
+
+    def __init__(self, database: sqlite3.Connection):
+        """Initialize the mini-project-1 shell
+
+        :param database: :class:`sqlite3.Connection` to the database to
+        interact with the mini-project-1 shell
+        """
+        super().__init__()
+        self.database = database
 
     # ===============================
     # Shell command definitions
@@ -39,6 +48,7 @@ class MiniProjectShell(cmd.Cmd):
         if self.login_member:
             self.logout()
         __log__.info("exiting mini-project-1 shell")
+        self.database.close()
         return True
 
     def do_offer_ride(self, arg):
