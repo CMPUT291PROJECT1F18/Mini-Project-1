@@ -24,7 +24,7 @@ def get_selection(items):
     while True:
         print("%i: %s" % (index, items[index]))
 
-        if index % 5 == 0:
+        if index % 5 == 4:
             print("Press Enter to see more\n")
             selection = str(input("Enter selection number: "))
 
@@ -39,7 +39,7 @@ def get_selection(items):
                 selection = int(selection)
                 if selection < len(items):
                     return selection
-            index = 0
+            index = -1
             print("An entry must be selected")
         index += 1
 
@@ -60,6 +60,7 @@ def get_location(dbcursor: sqlite3.Cursor, filter: str = None):
             return location
 
         # not a lcode --> see if its a substring of city, province or address
+        keyword = '%' + keyword + '%' # set keyword to be any string with keyword in it
         dbcursor.execute(
             "SELECT * FROM locations WHERE city LIKE ? OR prov LIKE ? OR address LIKE ?",
             (keyword, keyword, keyword))
@@ -177,8 +178,24 @@ pickup location matching the location code or the city entered. If there are mor
 
 
 if __name__ == "__main__":
-    conn = sqlite3.connect("test.db")
+    conn = sqlite3.connect("test2.db")
     dbcursor = conn.cursor()
-    get_location(dbcursor)
-    get_location(dbcursor)
-    get_location(dbcursor)
+
+    dbcursor.executescript(open("data/create_tables.sql", "r").read())
+    dbcursor.executescript(open("data/create_data.sql", "r").read())
+    conn.commit()
+    dbcursor.execute(
+        "SELECT * FROM locations Where city like '%Edm%'")
+
+    location = dbcursor.fetchall()
+    print(location)
+    print("-----------------")
+    try:
+        get_location(dbcursor)
+        get_location(dbcursor)
+        get_location(dbcursor)
+    except LookupError:
+        pass
+
+    dbcursor.close()
+    conn.close()  # <--- Close the connection..
