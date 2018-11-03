@@ -110,6 +110,7 @@ def offer_ride(dbcursor: sqlite3.Cursor, member: Member):
         price_per_seat = int(input("Enter price per seat: "))
     except ValueError:
         print("Must give numbers")
+        return
 
     luggage_desc = str(input("Luggage description: "))
 
@@ -120,7 +121,7 @@ def offer_ride(dbcursor: sqlite3.Cursor, member: Member):
         print("You must give locations to offer a ride")
     except LookupError:
         print("No locations")
-    pass
+    return
 
 
 """
@@ -137,7 +138,7 @@ wants to book seats on that ride.
 
 
 def search_for_ride():
-    """"""
+    """Search for rides"""
     pass
 
 
@@ -161,8 +162,8 @@ number and the email is set to the email address of the member.
 """
 
 
-def search_for_ride():
-    """"""
+def book_member():
+    """Book members"""
     pass
 
 
