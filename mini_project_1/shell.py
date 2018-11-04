@@ -85,12 +85,11 @@ class MiniProjectShell(cmd.Cmd):
         parser = get_cancel_booking_parser()
         try:
             args = parser.parse_args(arg.split())
-            delete_booking = 'DELETE FROM bookings WHERE bno=? AND email=?'
-            cur.execute(delete_booking, (args.bno, self.login_session.username,))
+            cur.execute("DELETE FROM bookings WHERE bno = ? AND email = ?", (args.bno, self.login_session.email,))
             # TODO: Spit out messages for ineffective commands
             # TODO: e.g. User has no rides, bno and email mismatch, etc.
-        except ShellArgumentException as e:
-            print(e)
+        except ShellArgumentException:
+            __log__.error("invalid cancel_booking argument")
 
     def help_cancel_bookings(self):
         """Cancel a booking"""
@@ -113,7 +112,7 @@ class MiniProjectShell(cmd.Cmd):
                 # create and insert the new ride request
                 self.database.execute(
                     "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)",
-                    (rid, self.login_member.username, args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
+                    (rid, self.login_session.email, args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
                 self.database.commit()
             except ShellArgumentException:
                 __log__.error("invalid post_ride_request argument")
@@ -163,7 +162,7 @@ class MiniProjectShell(cmd.Cmd):
                 __log__.warning("invalid login: bad username/password")
 
     def check_logged_in(self):
-        if self.login_member:
+        if self.login_session:
             return True
         else:
             __log__.error("you must be logged in to proceed!")
@@ -185,7 +184,7 @@ class ShellArgumentParser(argparse.ArgumentParser):
         raise ShellArgumentException(message)
 
 
-def price(price_string):
+def price(price_string) -> int:
     price = int(price_string)
     if price < 0:
         raise argparse.ArgumentTypeError(
@@ -196,7 +195,7 @@ def price(price_string):
     return price
 
 
-def date(date_str):
+def date(date_str) -> pendulum.DateTime:
     return pendulum.parse(date_str)
 
 
@@ -216,7 +215,7 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
     return parser
 
 
-def get_cancel_booking_parser():
+def get_cancel_booking_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
         description="Cancel a booking")
