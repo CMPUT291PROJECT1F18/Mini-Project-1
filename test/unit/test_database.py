@@ -64,3 +64,12 @@ def test_logout(mock_db):
     shell.logout()
     assert not shell.login_session
 
+
+def test_check_logged_in(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    assert not shell.check_logged_in()
+    assert not shell.login_session
+    shell.login("bob@123.ca", "foo")
+    assert shell.login_session
+    assert shell.check_logged_in()
