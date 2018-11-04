@@ -128,7 +128,7 @@ class MiniProjectShell(cmd.Cmd):
         list_requests = 'SELECT DISTINCT * ' \
                         'FROM requests ' \
                         'WHERE email=?;'
-        cur.execute(list_requests, (self.login_member.username.lower(),))
+        cur.execute(list_requests, (self.login_session.get_email().lower(),))
         rows = cur.fetchall()
         for row in rows:
             print(row)
