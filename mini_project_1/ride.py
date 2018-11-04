@@ -32,7 +32,7 @@ def get_selection(items):
                 selection = int(selection)
                 if selection < len(items):
                     return selection
-        elif index+1 == len(items):
+        elif index + 1 == len(items):
             selection = str(input("Enter selection number: "))
 
             if selection.isnumeric():
@@ -44,36 +44,36 @@ def get_selection(items):
         index += 1
 
 
-def get_location(dbcursor: sqlite3.Cursor, filter: str = None):
-    """Gets a location from the user."""
-    while True:
-        keyword = str(input("Enter a location keyword (exit to leave): "))
+def get_location_id(dbcursor: sqlite3.Cursor, prompt: str = ""):
+    """Gets a location lcode from the user."""
+    print(prompt)
+    keyword = str(input("Enter location keyword (exit to leave): "))
 
-        if keyword == "exit":
-            raise ConnectionAbortedError
+    if keyword == "exit":
+        raise ConnectionAbortedError
 
-        # get matching locations
-        dbcursor.execute(
-            "SELECT * FROM locations WHERE lcode = ?", (keyword,))
-        location = dbcursor.fetchall()
-        if location:
-            return location
+    # get exact match locde
+    dbcursor.execute(
+        "SELECT * FROM locations WHERE lcode = ?", (keyword,))
+    location = dbcursor.fetchall()
+    if location:
+        return location[0][0]
 
-        # not a lcode --> see if its a substring of city, province or address
-        keyword = '%' + keyword + '%' # set keyword to be any string with keyword in it
-        dbcursor.execute(
-            "SELECT * FROM locations WHERE city LIKE ? OR prov LIKE ? OR address LIKE ?",
-            (keyword, keyword, keyword))
-        locations = dbcursor.fetchall()
+    # get matching locations, since it's not a lcode
+    keyword = '%' + keyword + '%'
+    dbcursor.execute(
+        "SELECT * FROM locations WHERE city LIKE ? OR prov LIKE ? OR address LIKE ?",
+        (keyword, keyword, keyword))
+    locations = dbcursor.fetchall()
 
-        # display and get user selection if more than one
-        if len(locations) > 1:
-            return get_selection(locations)
-        elif locations:
-            return locations
-        else:
-            print("No locations for %s" %keyword)
-            raise LookupError
+    # display and get user selection if more than one
+    if len(locations) > 1:
+        return get_selection(locations)[0]
+    elif locations:
+        return locations[0][0]
+    else:
+        print("No locations for %s" % keyword)
+        raise LookupError
 
 
 def get_date_from_user(prompt: str = 'Enter the date (YYYY-MM-DD): '):
@@ -86,7 +86,7 @@ def get_date_from_user(prompt: str = 'Enter the date (YYYY-MM-DD): '):
         date = str(input(prompt))
         try:
             if date == "exit":
-                raise LookupError("Could not get date")
+                raise ConnectionAbortedError("Could not get date")
             date = datetime.strptime(date, '%Y-%m-%d')
             return date
         except ValueError:
@@ -94,34 +94,96 @@ def get_date_from_user(prompt: str = 'Enter the date (YYYY-MM-DD): '):
     pass
 
 
-def offer_ride(dbcursor: sqlite3.Cursor, member: Member):
+def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: Member):
+    dbcursor.execute("SELECT cno FROM cars WHERE cno = ? AND owner = ?", (cno, member.get_email()))
+    if len(dbcursor.fetchall()):
+        return True
+    return False
+
+
+def get_ride_offer_info(dbcursor: sqlite3.Cursor, member: Member):
+    date = num_of_seats = price_per_seat = luggage_desc = source = destination = None
+
+    try:
+        date = get_date_from_user()
+    except ConnectionAbortedError:
+        print("Aborting: You must give a date.")
+        return
+
+    try:
+        num_of_seats = int(input("Enter number of seats: "))
+        price_per_seat = int(input("Enter price per seat: "))
+    except ValueError:
+        print("Aborting: You must give a number")
+        return
+
+    luggage_desc = str(input("Enter luggage description: "))
+
+    try:
+        source = get_location_id(dbcursor, "Enter the ride source location: ")
+        destination = get_location_id(dbcursor, "Enter the ride destination location: ")
+    except ConnectionAbortedError:
+        print("Aborting: You must give locations to offer a ride")
+        return
+    except LookupError:
+        return
+
+    enroute = set()
+
+    while True:
+        try:
+            enroute.add(get_location_id(dbcursor, "Enter a enroute location: "))
+        except ConnectionAbortedError:
+            break
+        except LookupError:
+            print("No locations for that keyword")
+
+    wants_to_add_cno = str(input("Do you want to add a car number? [y] or [n]")) == 'y'
+    cno = None
+
+    while wants_to_add_cno:
+        try:
+            cno = int(input("Enter a car number or exit: "))
+            if check_valid_cno(dbcursor, cno, member):
+                break
+            print("You must give the car number of one of your cars")
+        except ValueError:
+            print("Please enter a number.")
+
+    return date, num_of_seats, price_per_seat, luggage_desc, source, destination, cno, enroute
+
+
+def offer_ride(database: sqlite3.Connection, member: Member):
     """
+    Error checking?: sqlite3.OperationalError & sqlite3.IntegrityError
 
     :param dbcursor:
     :param member:
     :return:
     """
-    try:
-        date = get_date_from_user()
-    except LookupError:
-        return
-    try:
-        num_of_seats = int(input("Enter number of seats: "))
-        price_per_seat = int(input("Enter price per seat: "))
-    except ValueError:
-        print("Must give numbers")
-        return
 
-    luggage_desc = str(input("Luggage description: "))
+    dbcursor = database.cursor()
+    ride_offer_info = get_ride_offer_info(dbcursor, member)
 
-    try:
-        source = get_location(dbcursor)
-        dest = get_location(dbcursor)
-    except ConnectionAbortedError:
-        print("You must give locations to offer a ride")
-    except LookupError:
-        print("No locations")
-    return
+    if ride_offer_info:
+        date, seats, price, luggage, source, destination, cno, enroute = ride_offer_info
+
+        dbcursor.execute("SELECT MAX(rno) FROM rides")
+        rno = str(int(dbcursor.fetchone()[0]) + 1)
+
+        dbcursor.execute(
+            "INSERT INTO rides (rno, price, rdate, seats, lugDesc, src, dst, driver) VALUES " +
+            "(?, ?, ?, ?, ?, ?, ?, ?)", (rno, price, date, seats, luggage, source, destination, member.get_email()))
+
+        if cno:
+            dbcursor.execute("UPDATE rides SET cno = ? WHERE rno = ?", (cno, rno))
+
+        for place in enroute:
+            dbcursor.execute("INSERT INTO enroute (rno, lcode) VALUES (?, ?)", (rno, place))
+
+        database.commit()
+        return True
+    return False
 
 
 """
@@ -176,27 +238,42 @@ pickup location matching the location code or the city entered. If there are mor
  asking the member to check out a ride.
 """
 
-
-
 if __name__ == "__main__":
     conn = sqlite3.connect("test2.db")
-    dbcursor = conn.cursor()
+    test_dbcursor = conn.cursor()
 
-    dbcursor.executescript(open("data/create_tables.sql", "r").read())
-    dbcursor.executescript(open("data/create_data.sql", "r").read())
-    conn.commit()
-    dbcursor.execute(
-        "SELECT * FROM locations Where city like '%Edm%'")
+    # test_dbcursor.executescript(open("data/create_tables.sql", "r").read())
+    # test_dbcursor.executescript(open("data/create_data.sql", "r").read())
+    # conn.commit()
+    test_dbcursor.execute(
+        "SELECT * FROM rides Where rno > 42")
 
-    location = dbcursor.fetchall()
-    print(location)
+    edm_location = test_dbcursor.fetchall()
+    print(edm_location)
+    test_dbcursor.execute(
+        "SELECT * FROM enroute Where rno > 42")
+
+    edm_location = test_dbcursor.fetchall()
+    print(edm_location)
     print("-----------------")
     try:
-        get_location(dbcursor)
-        get_location(dbcursor)
-        get_location(dbcursor)
+        offer_ride(conn, Member("jane_doe@abc.ca", "passyW"))
     except LookupError:
         pass
+    except ConnectionAbortedError:
+        pass
 
-    dbcursor.close()
+    test_dbcursor.execute(
+        "SELECT * FROM rides Where rno > 42")
+
+    edm_location = test_dbcursor.fetchall()
+    print(edm_location)
+    test_dbcursor.execute(
+        "SELECT * FROM enroute Where rno > 42")
+
+    edm_location = test_dbcursor.fetchall()
+    print(edm_location)
+
+    test_dbcursor.close()
+    # conn.commit()
     conn.close()  # <--- Close the connection..

@@ -14,3 +14,6 @@ class Member:
     def __init__(self, username: str, password: str):
         self.username = username
         self.password = password
+
+    def get_email(self):
+        return self.username
