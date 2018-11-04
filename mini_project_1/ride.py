@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 
-from mini_project_1.member import Member
+from mini_project_1.loginsession import LoginSession
 
 """
 Offer a ride.
@@ -95,7 +95,7 @@ def get_date_from_user(prompt: str = 'Enter the date (YYYY-MM-DD): '):
     pass
 
 
-def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: Member):
+def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: LoginSession):
     """ Returns whether a member has a car number cno in the database with cursor dbcursor"""
     dbcursor.execute("SELECT cno FROM cars WHERE cno = ? AND owner = ?", (cno, member.get_email()))
     if len(dbcursor.fetchall()):
@@ -103,7 +103,7 @@ def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: Member):
     return False
 
 
-def get_ride_offer_info(dbcursor: sqlite3.Cursor, member: Member):
+def get_ride_offer_info(dbcursor: sqlite3.Cursor, member: LoginSession):
     date = num_of_seats = price_per_seat = luggage_desc = source = destination = None
 
     try:
@@ -161,7 +161,7 @@ def get_ride_offer_info(dbcursor: sqlite3.Cursor, member: Member):
     return date, num_of_seats, price_per_seat, luggage_desc, source, destination, cno, enroute
 
 
-def offer_ride(database: sqlite3.Connection, member: Member):
+def offer_ride(database: sqlite3.Connection, member: LoginSession):
     """
     Tries to add a ride to the database for the member
     :return: if a ride has been added (True/False)
@@ -263,7 +263,7 @@ if __name__ == "__main__":
     print(edm_location)
     print("-----------------")
     try:
-        offer_ride(conn, Member("jane_doe@abc.ca", "passyW"))
+        offer_ride(conn, LoginSession("jane_doe@abc.ca", "passyW"))
     except LookupError:
         pass
     except ConnectionAbortedError:
