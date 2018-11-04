@@ -63,6 +63,9 @@ setup(
             "mini-project-1 = mini_project_1.__main__:main"
         ]
     },
+    install_requires=[
+        "pendulum>=2.0.4,<3.0.0"
+    ],
     extras_require={
         "docs": [
             "sphinx>=1.7.5,<2.0.0",
@@ -71,6 +74,7 @@ setup(
             "sphinx-argparse>=0.2.2,<1.0.0",
         ],
         "tests": [
+            "mock>=2.0.0,<3.0.0",
             "pytest",
             "pytest-cov",
             "pylint>=1.9.1,<2.0.0",
