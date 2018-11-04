@@ -64,16 +64,8 @@ class MiniProjectShell(cmd.Cmd):
         # TODO:
 
     def do_list_bookings(self, arg):
-        """List all your bookings you offer"""
-        cur = self.database.cursor()
-        list_bookings = 'SELECT DISTINCT bookings.* ' \
-                        'FROM bookings, rides ' \
-                        'WHERE rides.driver=? ' \
-                        'AND rides.rno=bookings.rno;'
-        cur.execute(list_bookings, (self.login_member.username,))
-        rows = cur.fetchall()
-        for row in rows:
-            print(row)
+        """List all of your bookings you offer"""
+        # TODO:
 
     def do_book_member(self, arg):
         """Book other members on a ride"""
@@ -145,7 +137,6 @@ class MiniProjectShell(cmd.Cmd):
             self.login_session = None
             __log__.info("logging out user: {}".format(email))
         else:
-            # TODO: possibly through error instead
             __log__.error("cannot logout not logged in")
 
     def login(self, email: str, password: str):
@@ -218,8 +209,7 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
 def get_cancel_booking_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
-        description="Cancel a booking")
+        description="Cancel a Booking")
 
-    parser.add_argument("bno", type=int,
-                        help="The booking identification number")
+    parser.add_argument("bno", type=int, help="The booking identification number")
     return parser
