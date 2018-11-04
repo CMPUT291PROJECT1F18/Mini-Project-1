@@ -72,7 +72,7 @@ class MiniProjectShell(cmd.Cmd):
         # TODO:
 
     def do_list_bookings(self, arg):
-        """List all your bookings you offer"""
+        """List all the bookings that the user offers"""
         cur = self.database.cursor()
         list_bookings = 'SELECT DISTINCT bookings.* ' \
                         'FROM bookings, rides ' \
@@ -132,8 +132,15 @@ class MiniProjectShell(cmd.Cmd):
         parser.print_help()
 
     def do_list_ride_requests(self, arg):
-        """List all of your ride requests"""
-        # TODO:
+        """List all the user's ride requests"""
+        cur = self.database.cursor()
+        list_requests = 'SELECT DISTINCT * ' \
+                        'FROM requests ' \
+                        'WHERE email=?;'
+        cur.execute(list_requests, (self.login_member.username.lower(),))
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
 
     def do_search_ride_requests(self, arg):
         """Search for a ride request"""
