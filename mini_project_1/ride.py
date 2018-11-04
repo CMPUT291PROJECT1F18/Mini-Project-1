@@ -19,7 +19,12 @@ as the driver of the ride.
 """
 
 
-def get_selection(items):
+def get_selection(items: list):
+    """
+    Gets the user to select a item from a list, displaying up to 5 items at a time.
+    :param items: list of items
+    :return: selected item from items
+    """
     index = 0
     while True:
         print("%i: %s" % (index, items[index]))
@@ -77,11 +82,7 @@ def get_location_id(dbcursor: sqlite3.Cursor, prompt: str = ""):
 
 
 def get_date_from_user(prompt: str = 'Enter the date (YYYY-MM-DD): '):
-    """
-    Gets and returns a date from the user
-    :param prompt:
-    :return:
-    """
+    """ Gets and returns a date from the user """
     while 1:
         date = str(input(prompt))
         try:
@@ -95,6 +96,7 @@ def get_date_from_user(prompt: str = 'Enter the date (YYYY-MM-DD): '):
 
 
 def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: Member):
+    """ Returns whether a member has a car number cno in the database with cursor dbcursor"""
     dbcursor.execute("SELECT cno FROM cars WHERE cno = ? AND owner = ?", (cno, member.get_email()))
     if len(dbcursor.fetchall()):
         return True
@@ -161,11 +163,8 @@ def get_ride_offer_info(dbcursor: sqlite3.Cursor, member: Member):
 
 def offer_ride(database: sqlite3.Connection, member: Member):
     """
-    Error checking?: sqlite3.OperationalError & sqlite3.IntegrityError
-
-    :param dbcursor:
-    :param member:
-    :return:
+    Tries to add a ride to the database for the member
+    :return: if a ride has been added (True/False)
     """
 
     dbcursor = database.cursor()
@@ -177,6 +176,7 @@ def offer_ride(database: sqlite3.Connection, member: Member):
         dbcursor.execute("SELECT MAX(rno) FROM rides")
         rno = str(int(dbcursor.fetchone()[0]) + 1)
 
+        # TODO: more error checking? sqlite3.OperationalError & sqlite3.IntegrityError
         dbcursor.execute(
             "INSERT INTO rides (rno, price, rdate, seats, lugDesc, src, dst, driver) VALUES " +
             "(?, ?, ?, ?, ?, ?, ?, ?)", (rno, price, date, seats, luggage, source, destination, member.get_email()))
