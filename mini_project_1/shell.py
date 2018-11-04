@@ -44,8 +44,11 @@ class MiniProjectShell(cmd.Cmd):
         super().__init__()
         self.database = database
 
+    def cmdloop(self, intro=None):
         # start a login command at start.
         self.do_login(None)
+        super().cmdloop()
+
 
     # ===============================
     # Shell command definitions
@@ -176,10 +179,13 @@ class MiniProjectShell(cmd.Cmd):
 
     @logged_in
     def logout(self):
-        """Logout method"""
+        """Logout method
+
+        Set the shell's ``login_session`` to :obj:`None`.
+        """
         email = self.login_session.get_email()
         self.login_session = None
-        __log__.info("logging out user: {}".format(email))
+        __log__.info("logged out user: {}".format(email))
 
     def login(self, email: str, password: str):
         """Login method
@@ -187,7 +193,7 @@ class MiniProjectShell(cmd.Cmd):
         Check if a :class:`LoginSession` already exists for the shell if not
         attempt to login with the given email and password.
 
-        If the login attempt is successful set the shell's login_session
+        If the login attempt is successful set the shell's ``login_session``
         to the newly created :class:`LoginSession`.
         """
         if self.login_session:
