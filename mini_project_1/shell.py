@@ -94,7 +94,7 @@ class MiniProjectShell(cmd.Cmd):
                     (rid, self.login_member.username, args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
                 self.database.commit()
             except ShellArgumentException as e:
-                print(e)
+                __log__.error("invalid ride request argument", e)
 
     def help_post_ride_request(self):
         """Post a ride request's parsers help message"""
