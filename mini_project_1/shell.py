@@ -12,6 +12,7 @@ from logging import getLogger
 
 import pendulum
 
+from mini_project_1.ride import offer_ride
 from mini_project_1.member import Member
 
 __log__ = getLogger(__name__)
@@ -58,6 +59,13 @@ class MiniProjectShell(cmd.Cmd):
     def do_offer_ride(self, arg):
         """Offer a ride"""
         # TODO:
+        if self.login_member:
+            if offer_ride(self.database.cursor(), self.login_member):
+                print("Ride added!")
+            else:
+                print("Did not add a ride...   8-( ")
+        else:
+            print("Must be logged in to offer a ride.")
 
     def do_search_rides(self, arg):
         """Search for ride"""
