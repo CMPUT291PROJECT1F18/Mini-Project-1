@@ -176,7 +176,7 @@ class ShellArgumentParser(argparse.ArgumentParser):
         raise ShellArgumentException(message)
 
 
-def price(price_string) -> int:
+def price(price_string: str) -> int:
     price = int(price_string)
     if price < 0:
         raise argparse.ArgumentTypeError(
@@ -187,7 +187,7 @@ def price(price_string) -> int:
     return price
 
 
-def date(date_str) -> pendulum.DateTime:
+def date(date_str: str) -> pendulum.DateTime:
     return pendulum.parse(date_str)
 
 
