@@ -137,7 +137,6 @@ class MiniProjectShell(cmd.Cmd):
             self.login_session = None
             __log__.info("logging out user: {}".format(email))
         else:
-            # TODO: possibly through error instead
             __log__.error("cannot logout not logged in")
 
     def login(self, email: str, password: str):
@@ -210,7 +209,7 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
 def get_cancel_booking_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
-        description="Test")
+        description="Cancel a Booking")
 
     parser.add_argument("bno", type=int, help="The booking identification number")
     return parser
