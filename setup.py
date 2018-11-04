@@ -63,6 +63,9 @@ setup(
             "mini-project-1 = mini_project_1.__main__:main"
         ]
     },
+    install_requires=[
+        "pendulum>=2.0.4,<3.0.0"
+    ],
     extras_require={
         "docs": [
             "sphinx>=1.7.5,<2.0.0",

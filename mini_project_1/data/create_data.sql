@@ -9,7 +9,7 @@
 -- add multiple bookings for a single ride that fills up the total seats for q7
 ------------- TODO -------------
 
--- |email|name|phone|
+-- |email|name|phone|password|
 insert into members values
         ('jane_doe@abc.ca', 'Jane Maria-Ann Doe', '780-342-7584', ''),
         ('bob@123.ca', 'Bob Williams', '780-342-2834', 'foo'),
