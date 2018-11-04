@@ -7,6 +7,8 @@ import os
 import sqlite3
 import pytest
 import mini_project_1
+from mini_project_1.shell import MiniProjectShell
+
 
 DATABASE_DIR = os.path.join(
     os.path.dirname(os.path.realpath(mini_project_1.__file__)),
@@ -41,3 +43,20 @@ def test_example(mock_db):
     """Test example for interacting with data mocks"""
     database = sqlite3.connect(mock_db)
     print(database.execute("""SELECT name FROM members""").fetchall())
+
+
+def test_login(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+    assert shell.login_session
+
+
+def test_logout(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+    assert shell.login_session
+    shell.logout()
+    assert not shell.login_session
+
