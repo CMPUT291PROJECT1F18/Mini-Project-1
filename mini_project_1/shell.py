@@ -3,7 +3,10 @@
 
 """Main command shell for mini-project-1"""
 
+import argparse
+import sys
 import cmd
+import shlex
 import sqlite3
 from getpass import getpass
 from logging import getLogger
@@ -73,7 +76,13 @@ class MiniProjectShell(cmd.Cmd):
 
     def do_post_ride_request(self, arg):
         """Post a ride request"""
-        # TODO:
+        parser = get_post_ride_request_parser()
+        parser.parse_args(shlex.split(arg))
+
+    def help_post_ride_request(self):
+        """Post a ride request"""
+        parser = get_post_ride_request_parser()
+        parser.print_help()
 
     def do_list_ride_requests(self, arg):
         """List all of your ride requests"""
@@ -106,3 +115,26 @@ class MiniProjectShell(cmd.Cmd):
         # TODO: validate login
         self.login_member = Member(username, password)
         __log__.info("logged in user: {}".format(username))
+
+
+def parse(arg):
+    """Convert a series of zero or more numbers to an argument tuple"""
+    return tuple(arg.split())
+
+
+class ShellArgumentParser(argparse.ArgumentParser):
+
+    def error(self, message):
+        self.print_help(sys.stderr)
+
+
+def get_post_ride_request_parser():
+    parser = ShellArgumentParser(
+        add_help=False,
+        description="Post a ride request")
+
+    parser.add_argument("date", help="Date the ride should start on")
+    parser.add_argument("pickup-location-code", help="The location code for the pickup location of the ride")
+    parser.add_argument("dropoff-location-code", help="The location code for the dropoff location of the ride")
+    parser.add_argument("per-seat-price", help="The maximum amount you are willing to pay per seat for the ride")
+    return parser
