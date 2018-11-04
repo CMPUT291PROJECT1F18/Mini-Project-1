@@ -58,7 +58,10 @@ class MiniProjectShell(cmd.Cmd):
         """Offer a ride"""
         # TODO:
         if self.login_member:
-            offer_ride(self.database.cursor(), self.login_member)
+            if offer_ride(self.database.cursor(), self.login_member):
+                print("Ride added!")
+            else:
+                print("Did not add a ride...   8-( ")
         else:
             print("Must be logged in to offer a ride.")
 
