@@ -112,14 +112,39 @@ class MiniProjectShell(cmd.Cmd):
         parser = get_cancel_booking_parser()
         try:
             args = parser.parse_args(arg.split())
-            cur.execute("DELETE FROM bookings WHERE bno = ? AND email = ?", (args.bno, self.login_session.get_email(),))
-            # TODO: Spit out messages for ineffective commands
-            # TODO: e.g. User has no rides, bno and email mismatch, etc.
+
+            booking_to_delete = "SELECT bookings.* FROM bookings, rides " \
+                                "WHERE bookings.bno=? " \
+                                "AND rides.driver=? " \
+                                "AND bookings.rno = rides.rno;"
+            cur.execute(booking_to_delete,
+                        (args.bno, self.login_session.get_email(),))
+            to_delete = cur.fetchall()
+
+            if len(to_delete) == 0:
+                print("You don't have a booking where bno={}".format(args.bno))
+                print("Your bookings:")
+                self.do_list_bookings(self)
+                return
+
+            cancel_booking = "DELETE FROM bookings " \
+                             "WHERE EXISTS(" \
+                             "SELECT * FROM bookings b2, rides " \
+                             "WHERE b2.bno=?" \
+                             "AND bookings.bno=b2.bno " \
+                             "AND rides.driver=?" \
+                             "AND b2.rno = rides.rno);"
+            
+            cur.execute(cancel_booking,
+                        (args.bno, self.login_session.get_email(),))
+            self.database.commit()
+
+            print("Successfully deleted:\n{}".format(to_delete))
         except ShellArgumentException:
             __log__.error("invalid cancel_booking argument")
 
     def help_cancel_booking(self):
-        """Cancel a booking"""
+        """Parser help message for cancelling a booking"""
         parser = get_cancel_booking_parser()
         parser.print_help()
 
@@ -295,7 +320,7 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
 def get_cancel_booking_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
-        description="Cancel a Booking")
+        description="Cancel a booking")
 
     parser.add_argument("bno", type=int,
                         help="The booking identification number")
