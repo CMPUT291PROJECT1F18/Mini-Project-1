@@ -111,8 +111,14 @@ def get_ride_offer_info(dbcursor: sqlite3.Cursor, member: Member):
         return
 
     try:
-        num_of_seats = int(input("Enter number of seats: "))
-        price_per_seat = int(input("Enter price per seat: "))
+        while True:
+            num_of_seats = int(input("Enter number of seats: "))
+            if num_of_seats > 0:
+                break
+        while True:
+            price_per_seat = int(input("Enter price per seat: "))
+            if num_of_seats >= 0:
+                price_per_seat
     except ValueError:
         print("Aborting: You must give a number")
         return
