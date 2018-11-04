@@ -86,10 +86,12 @@ class MiniProjectShell(cmd.Cmd):
                 max_rid = self.database.execute("select max(r.rid) from requests r").fetchone()[0]
                 if not max_rid:
                     max_rid = 0
-
                 rid = 1 + int(max_rid)
+
                 # create and insert the new ride request
-                self.database.execute("INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)", (rid, self.login_member.username, args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
+                self.database.execute(
+                    "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)",
+                    (rid, self.login_member.username, args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
                 self.database.commit()
             except ShellArgumentException as e:
                 print(e)
@@ -137,12 +139,6 @@ class MiniProjectShell(cmd.Cmd):
         else:
             __log__.error("you must be logged in to proceed!")
             return False
-
-    # TODO: maybe have a try catch structure for all commands invocation
-    def get_login_user_email(self):
-        emails = self.database.execute("SELECT DISTINCT email FROM members where name = ? and pwd = ?", (self.login_member.username, self.login_member.password)).fetchall()
-        print(emails)
-        return emails[0]
 
 
 class NotLoggedInException(Exception):
