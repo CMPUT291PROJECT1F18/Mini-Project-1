@@ -3,6 +3,8 @@
 
 """Main command shell for mini-project-1"""
 
+import argparse
+import sys
 import cmd
 import sqlite3
 from getpass import getpass
@@ -69,7 +71,21 @@ class MiniProjectShell(cmd.Cmd):
 
     def do_cancel_booking(self, arg):
         """Cancel a booking"""
-        # TODO:
+        cur = self.database.cursor()
+        parser = get_cancel_booking_parser()
+        try:
+            args = parser.parse_args(arg.split())
+            delete_booking = 'DELETE FROM bookings WHERE bno=? AND email=?'
+            cur.execute(delete_booking, (args.bno, self.login_member.username,))
+            # TODO: Spit out messages for ineffective commands
+            # TODO: e.g. User has no rides, bno and email mismatch, etc.
+        except ShellArgumentException as e:
+            print(e)
+
+    def help_cancel_bookings(self):
+        """Cancel a booking"""
+        parser = get_cancel_booking_parser()
+        parser.print_help()
 
     def do_post_ride_request(self, arg):
         """Post a ride request"""
@@ -106,3 +122,28 @@ class MiniProjectShell(cmd.Cmd):
         # TODO: validate login
         self.login_member = Member(username, password)
         __log__.info("logged in user: {}".format(username))
+
+
+def parse(arg):
+    """Convert a series of zero or more numbers to an argument tuple"""
+    return tuple(arg.split())
+
+
+class ShellArgumentException(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+
+
+class ShellArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        self.print_help(sys.stderr)
+        raise ShellArgumentException(message)
+
+
+def get_cancel_booking_parser():
+    parser = ShellArgumentParser(
+        add_help=False,
+        description="Test")
+
+    parser.add_argument("bno", type=int, help="The booking identification number")
+    return parser
