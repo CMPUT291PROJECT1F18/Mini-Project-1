@@ -158,10 +158,6 @@ class MiniProjectShell(cmd.Cmd):
 class NotLoggedInException(Exception):
     pass
 
-def parse(arg):
-    """Convert a series of zero or more numbers to an argument tuple"""
-    return tuple(arg.split())
-
 
 class ShellArgumentException(Exception):
     def __init__(self, *args, **kwargs):
@@ -172,7 +168,8 @@ class ShellArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         self.print_help(sys.stderr)
         raise ShellArgumentException(message)
-        
+
+
 def price(price_string):
     price = int(price_string)
     if price < 0:
