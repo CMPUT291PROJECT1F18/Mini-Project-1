@@ -71,6 +71,7 @@ setup(
             "sphinx-argparse>=0.2.2,<1.0.0",
         ],
         "tests": [
+            "mock>=2.0.0,<3.0.0",
             "pytest",
             "pytest-cov",
             "pylint>=1.9.1,<2.0.0",
