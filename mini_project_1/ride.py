@@ -60,10 +60,10 @@ def get_location_id(dbcursor: sqlite3.Cursor, prompt: str = ""):
         return location[0][0]
 
     # get matching locations, since it's not a lcode
-    keyword = '%' + keyword + '%'
+    kw = '%' + keyword + '%'
     dbcursor.execute(
         "SELECT * FROM locations WHERE city LIKE ? OR prov LIKE ? OR address LIKE ?",
-        (keyword, keyword, keyword))
+        (kw, kw, kw))
     locations = dbcursor.fetchall()
 
     # display and get user selection if more than one
