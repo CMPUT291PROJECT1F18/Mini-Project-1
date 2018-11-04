@@ -64,8 +64,16 @@ class MiniProjectShell(cmd.Cmd):
         # TODO:
 
     def do_list_bookings(self, arg):
-        """List all of your bookings you offer"""
-        # TODO:
+        """List all your bookings you offer"""
+        cur = self.database.cursor()
+        list_bookings = 'SELECT DISTINCT bookings.* ' \
+                        'FROM bookings, rides ' \
+                        'WHERE rides.driver=? ' \
+                        'AND rides.rno=bookings.rno;'
+        cur.execute(list_bookings, (self.login_session.get_email(),))
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
 
     def do_book_member(self, arg):
         """Book other members on a ride"""
@@ -77,7 +85,7 @@ class MiniProjectShell(cmd.Cmd):
         parser = get_cancel_booking_parser()
         try:
             args = parser.parse_args(arg.split())
-            cur.execute("DELETE FROM bookings WHERE bno = ? AND email = ?", (args.bno, self.login_session.email,))
+            cur.execute("DELETE FROM bookings WHERE bno = ? AND email = ?", (args.bno, self.login_session.get_email(),))
             # TODO: Spit out messages for ineffective commands
             # TODO: e.g. User has no rides, bno and email mismatch, etc.
         except ShellArgumentException:
@@ -104,7 +112,7 @@ class MiniProjectShell(cmd.Cmd):
                 # create and insert the new ride request
                 self.database.execute(
                     "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)",
-                    (rid, self.login_session.email, args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
+                    (rid, self.login_session.get_email(), args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
                 self.database.commit()
             except ShellArgumentException:
                 __log__.error("invalid post_ride_request argument")
@@ -133,7 +141,7 @@ class MiniProjectShell(cmd.Cmd):
     def logout(self):
         """Logout method"""
         if self.login_session:
-            email = self.login_session.email
+            email = self.login_session.get_email()
             self.login_session = None
             __log__.info("logging out user: {}".format(email))
         else:
@@ -142,7 +150,7 @@ class MiniProjectShell(cmd.Cmd):
     def login(self, email: str, password: str):
         """Login method"""
         if self.login_session:
-            __log__.error("already logged in as user: {}".format(self.login_session.email))
+            __log__.error("already logged in as user: {}".format(self.login_session.get_email()))
         else:
             user_hit = self.database.execute("select email, pwd from members where email = ? and pwd = ?",
                                              (email.lower(), password)).fetchone()
@@ -211,5 +219,6 @@ def get_cancel_booking_parser() -> ShellArgumentParser:
         add_help=False,
         description="Cancel a Booking")
 
-    parser.add_argument("bno", type=int, help="The booking identification number")
+    parser.add_argument("bno", type=int,
+                        help="The booking identification number")
     return parser

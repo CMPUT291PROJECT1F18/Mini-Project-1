@@ -16,4 +16,4 @@ class LoginSession:
         self.password = password
 
     def get_email(self):
-        return self.username
+        return self.email
