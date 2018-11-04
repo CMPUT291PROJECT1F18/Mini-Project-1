@@ -49,7 +49,6 @@ class MiniProjectShell(cmd.Cmd):
         self.do_login(None)
         super().cmdloop()
 
-
     # ===============================
     # Shell command definitions
     # ===============================
@@ -118,7 +117,6 @@ class MiniProjectShell(cmd.Cmd):
             # TODO: e.g. User has no rides, bno and email mismatch, etc.
         except ShellArgumentException:
             __log__.error("invalid cancel_booking argument")
-
 
     def help_cancel_booking(self):
         """Cancel a booking"""
