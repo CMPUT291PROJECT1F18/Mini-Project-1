@@ -12,8 +12,7 @@ from logging import getLogger
 
 import pendulum
 
-from mini_project_1.ride import offer_ride
-from mini_project_1.member import Member
+from mini_project_1.loginsession import LoginSession
 
 __log__ = getLogger(__name__)
 
@@ -23,7 +22,7 @@ class MiniProjectShell(cmd.Cmd):
     intro = \
         "Welcome to mini-project-1 shell. Type help or ? to list commands\n"
     prompt = "mini-project-1>"
-    login_member: Member = None
+    login_session: LoginSession = None
 
     def __init__(self, database: sqlite3.Connection):
         """Initialize the mini-project-1 shell
@@ -50,7 +49,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def do_exit(self, arg):
         """Logout (if needed) and exit out of the mini-project-1 shell: exit"""
-        if self.login_member:
+        if self.login_session:
             self.logout()
         __log__.info("exiting mini-project-1 shell")
         self.database.close()
@@ -59,13 +58,6 @@ class MiniProjectShell(cmd.Cmd):
     def do_offer_ride(self, arg):
         """Offer a ride"""
         # TODO:
-        if self.login_member:
-            if offer_ride(self.database.cursor(), self.login_member):
-                print("Ride added!")
-            else:
-                print("Did not add a ride...   8-( ")
-        else:
-            print("Must be logged in to offer a ride.")
 
     def do_search_rides(self, arg):
         """Search for ride"""
@@ -78,7 +70,7 @@ class MiniProjectShell(cmd.Cmd):
                         'FROM bookings, rides ' \
                         'WHERE rides.driver=? ' \
                         'AND rides.rno=bookings.rno;'
-        cur.execute(list_bookings, (self.login_member.username,))
+        cur.execute(list_bookings, (self.login_session.get_email(),))
         rows = cur.fetchall()
         for row in rows:
             print(row)
@@ -93,12 +85,11 @@ class MiniProjectShell(cmd.Cmd):
         parser = get_cancel_booking_parser()
         try:
             args = parser.parse_args(arg.split())
-            delete_booking = 'DELETE FROM bookings WHERE bno=? AND email=?'
-            cur.execute(delete_booking, (args.bno, self.login_member.username,))
+            cur.execute("DELETE FROM bookings WHERE bno = ? AND email = ?", (args.bno, self.login_session.get_email(),))
             # TODO: Spit out messages for ineffective commands
             # TODO: e.g. User has no rides, bno and email mismatch, etc.
-        except ShellArgumentException as e:
-            print(e)
+        except ShellArgumentException:
+            __log__.error("invalid cancel_booking argument")
 
     def help_cancel_bookings(self):
         """Cancel a booking"""
@@ -121,7 +112,7 @@ class MiniProjectShell(cmd.Cmd):
                 # create and insert the new ride request
                 self.database.execute(
                     "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)",
-                    (rid, self.login_member.username, args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
+                    (rid, self.login_session.get_email(), args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
                 self.database.commit()
             except ShellArgumentException:
                 __log__.error("invalid post_ride_request argument")
@@ -156,22 +147,36 @@ class MiniProjectShell(cmd.Cmd):
 
     def logout(self):
         """Logout method"""
-        if self.login_member:
-            username = self.login_member.username
-            self.login_member = None
-            __log__.info("logging out user: {}".format(username))
+        if self.login_session:
+            email = self.login_session.get_email()
+            self.login_session = None
+            __log__.info("logging out user: {}".format(email))
         else:
-            # TODO: possibly through error instead
             __log__.error("cannot logout not logged in")
 
-    def login(self, username: str, password: str):
-        """Login method"""
-        # TODO: validate login
-        self.login_member = Member(username, password)
-        __log__.info("logged in user: {}".format(username))
+    def login(self, email: str, password: str):
+        """Login method
+
+        Check if a :class:`LoginSession` already exists for the shell if not
+        attempt to login with the given email and password.
+
+        If the login attempt is successful set the shell's login_session
+        to the newly created :class:`LoginSession`.
+        """
+        if self.login_session:
+            __log__.error("already logged in as user: {}".format(self.login_session.get_email()))
+        else:
+            user_hit = self.database.execute("select email, pwd from members where email = ? and pwd = ?",
+                                             (email.lower(), password)).fetchone()
+            if user_hit:
+                self.login_session = LoginSession(user_hit[0], user_hit[1])
+                __log__.info("logged in user: {}".format(user_hit[0]))
+            else:
+                __log__.warning("invalid login: bad username/password")
 
     def check_logged_in(self):
-        if self.login_member:
+        """Check if a valid :class:`LoginSession` exists for the shell"""
+        if self.login_session:
             return True
         else:
             __log__.error("you must be logged in to proceed!")
@@ -193,7 +198,7 @@ class ShellArgumentParser(argparse.ArgumentParser):
         raise ShellArgumentException(message)
 
 
-def price(price_string):
+def price(price_string: str) -> int:
     price = int(price_string)
     if price < 0:
         raise argparse.ArgumentTypeError(
@@ -204,7 +209,7 @@ def price(price_string):
     return price
 
 
-def date(date_str):
+def date(date_str: str) -> pendulum.DateTime:
     return pendulum.parse(date_str)
 
 
@@ -224,10 +229,10 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
     return parser
 
 
-def get_cancel_booking_parser():
+def get_cancel_booking_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
-        description="Cancel a booking")
+        description="Cancel a Booking")
 
     parser.add_argument("bno", type=int,
                         help="The booking identification number")
