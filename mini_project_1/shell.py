@@ -77,10 +77,13 @@ class MiniProjectShell(cmd.Cmd):
     def do_post_ride_request(self, arg):
         """Post a ride request"""
         parser = get_post_ride_request_parser()
-        parser.parse_args(shlex.split(arg))
+        try:
+            args = parser.parse_args(arg.split())
+        except ShellArgumentException as e:
+            print(e)
 
     def help_post_ride_request(self):
-        """Post a ride request"""
+        """Post a ride request's parsers help message"""
         parser = get_post_ride_request_parser()
         parser.print_help()
 
@@ -117,24 +120,45 @@ class MiniProjectShell(cmd.Cmd):
         __log__.info("logged in user: {}".format(username))
 
 
-def parse(arg):
-    """Convert a series of zero or more numbers to an argument tuple"""
-    return tuple(arg.split())
+class ShellArgumentException(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
 
 
 class ShellArgumentParser(argparse.ArgumentParser):
-
     def error(self, message):
         self.print_help(sys.stderr)
+        raise ShellArgumentException(message)
 
 
-def get_post_ride_request_parser():
+def price(price_string):
+    price = float(price_string)
+    if price < 0:
+        raise argparse.ArgumentTypeError(
+            "invalid price: {} (please choose a non negitive price)".format(
+                price_string
+            )
+        )
+    return price
+
+
+def date(date_str):
+    import pendulum
+    date = pendulum.parse(date_str)
+    return date
+
+
+def get_post_ride_request_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
         description="Post a ride request")
 
-    parser.add_argument("date", help="Date the ride should start on")
-    parser.add_argument("pickup-location-code", help="The location code for the pickup location of the ride")
-    parser.add_argument("dropoff-location-code", help="The location code for the dropoff location of the ride")
-    parser.add_argument("per-seat-price", help="The maximum amount you are willing to pay per seat for the ride")
+    parser.add_argument("date", type=date,
+                        help="Date the ride should start on")
+    parser.add_argument("pickup-location-code",
+                        help="The location code for the pickup location of the ride")
+    parser.add_argument("dropoff-location-code",
+                        help="The location code for the dropoff location of the ride")
+    parser.add_argument("per-seat-price", type=price,
+                        help="The maximum amount you are willing to pay per seat for the ride")
     return parser
