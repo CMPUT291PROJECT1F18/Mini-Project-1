@@ -148,7 +148,14 @@ class MiniProjectShell(cmd.Cmd):
             __log__.error("cannot logout not logged in")
 
     def login(self, email: str, password: str):
-        """Login method"""
+        """Login method
+
+        Check if a :class:`LoginSession` already exists for the shell if not
+        attempt to login with the given email and password.
+
+        If the login attempt is successful set the shell's login_session
+        to the newly created :class:`LoginSession`.
+        """
         if self.login_session:
             __log__.error("already logged in as user: {}".format(self.login_session.get_email()))
         else:
@@ -161,6 +168,7 @@ class MiniProjectShell(cmd.Cmd):
                 __log__.warning("invalid login: bad username/password")
 
     def check_logged_in(self):
+        """Check if a valid :class:`LoginSession` exists for the shell"""
         if self.login_session:
             return True
         else:
