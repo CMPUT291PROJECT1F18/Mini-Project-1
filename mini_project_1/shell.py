@@ -162,9 +162,53 @@ class MiniProjectShell(cmd.Cmd):
             print(row)
 
     @logged_in
-    def do_search_ride_requests(self, arg):
-        """Search for a ride request"""
-        # TODO:
+    def do_search_ride_requests_by_location_code(self, arg):
+        """Search for a ride request by location number"""
+        cur = self.database.cursor()
+        parser = get_search_ride_requests_by_location_code_parser()
+
+        try:
+            args = parser.parse_args(arg.split())
+            list_requests = 'SELECT DISTINCT requests.* ' \
+                            'FROM requests ' \
+                            'WHERE pickup=?;'
+            cur.execute(list_requests, (args.lcode,))
+            rows = cur.fetchall()
+            # TODO: Limit to 5, ask if user wants more
+            for row in rows:
+                print(row)
+        except ShellArgumentException:
+            __log__.error("invalid argument")
+
+    def help_search_ride_requests_by_location_code(self):
+        """Parser help message for searching ride requests by location code"""
+        parser = get_search_ride_requests_by_location_code_parser()
+        parser.print_help()
+
+    @logged_in
+    def do_search_ride_requests_by_city_name(self, arg):
+        """Search for a ride quest by city name"""
+        cur = self.database.cursor()
+        parser = get_search_ride_requests_by_city_name_parser()
+
+        try:
+            args = parser.parse_args(arg.split())
+            list_requests = 'SELECT DISTINCT requests.* ' \
+                            'FROM requests, locations ' \
+                            'WHERE requests.pickup=locations.lcode ' \
+                            'AND locations.city=?;'
+            cur.execute(list_requests, (args.city.lower(),))
+            rows = cur.fetchall()
+            # TODO: Limit to 5, ask if user wants more
+            for row in rows:
+                print(row)
+        except ShellArgumentException:
+            __log__.error("invalid argument")
+
+    def help_search_ride_requests_by_city_name(self):
+        """Parser help message for searching ride requests by city name"""
+        parser = get_search_ride_requests_by_city_name_parser()
+        parser.print_help()
 
     @logged_in
     def do_delete_ride_request(self, arg):
@@ -255,4 +299,26 @@ def get_cancel_booking_parser() -> ShellArgumentParser:
 
     parser.add_argument("bno", type=int,
                         help="The booking identification number")
+    return parser
+
+
+def get_search_ride_requests_by_location_code_parser() -> ShellArgumentParser:
+    parser = ShellArgumentParser(
+        add_help=False,
+        description="Search ride requests by location code")
+
+    parser.add_argument("lcode", type=str,
+                        help="The location code to search by")
+
+    return parser
+
+
+def get_search_ride_requests_by_city_name_parser() -> ShellArgumentParser:
+    parser = ShellArgumentParser(
+        add_help=False,
+        description="Search ride requests by city name")
+
+    parser.add_argument("city", type=str,
+                        help="The name of the city to search by")
+
     return parser
