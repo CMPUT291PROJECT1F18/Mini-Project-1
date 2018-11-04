@@ -9,21 +9,18 @@ import cmd
 import sqlite3
 from getpass import getpass
 from logging import getLogger
-
-import pendulum
-
-from mini_project_1.ride import offer_ride
-from mini_project_1.member import Member
+from mini_project_1.loginsession import LoginSession
 
 __log__ = getLogger(__name__)
 
 
+# TODO: maybe have a try catch structure for all commands invocation
 class MiniProjectShell(cmd.Cmd):
     """Main shell for mini-project-1"""
     intro = \
         "Welcome to mini-project-1 shell. Type help or ? to list commands\n"
     prompt = "mini-project-1>"
-    login_member: Member = None
+    login_session: LoginSession = None
 
     def __init__(self, database: sqlite3.Connection):
         """Initialize the mini-project-1 shell
@@ -50,7 +47,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def do_exit(self, arg):
         """Logout (if needed) and exit out of the mini-project-1 shell: exit"""
-        if self.login_member:
+        if self.login_session:
             self.logout()
         __log__.info("exiting mini-project-1 shell")
         self.database.close()
@@ -59,13 +56,6 @@ class MiniProjectShell(cmd.Cmd):
     def do_offer_ride(self, arg):
         """Offer a ride"""
         # TODO:
-        if self.login_member:
-            if offer_ride(self.database.cursor(), self.login_member):
-                print("Ride added!")
-            else:
-                print("Did not add a ride...   8-( ")
-        else:
-            print("Must be logged in to offer a ride.")
 
     def do_search_rides(self, arg):
         """Search for ride"""
@@ -94,7 +84,7 @@ class MiniProjectShell(cmd.Cmd):
         try:
             args = parser.parse_args(arg.split())
             delete_booking = 'DELETE FROM bookings WHERE bno=? AND email=?'
-            cur.execute(delete_booking, (args.bno, self.login_member.username,))
+            cur.execute(delete_booking, (args.bno, self.login_session.username,))
             # TODO: Spit out messages for ineffective commands
             # TODO: e.g. User has no rides, bno and email mismatch, etc.
         except ShellArgumentException as e:
@@ -107,29 +97,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def do_post_ride_request(self, arg):
         """Post a ride request"""
-        if self.check_logged_in():
-            parser = get_post_ride_request_parser()
-            try:
-                args = parser.parse_args(arg.split())
-
-                # generate a new rid
-                max_rid = self.database.execute("select max(r.rid) from requests r").fetchone()[0]
-                if not max_rid:
-                    max_rid = 0
-                rid = 1 + int(max_rid)
-
-                # create and insert the new ride request
-                self.database.execute(
-                    "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)",
-                    (rid, self.login_member.username, args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
-                self.database.commit()
-            except ShellArgumentException:
-                __log__.error("invalid post_ride_request argument")
-
-    def help_post_ride_request(self):
-        """Post a ride request's parsers help message"""
-        parser = get_post_ride_request_parser()
-        parser.print_help()
+        # TODO:
 
     def do_list_ride_requests(self, arg):
         """List all of your ride requests"""
@@ -149,30 +117,31 @@ class MiniProjectShell(cmd.Cmd):
 
     def logout(self):
         """Logout method"""
-        if self.login_member:
-            username = self.login_member.username
-            self.login_member = None
-            __log__.info("logging out user: {}".format(username))
+        if self.login_session:
+            email = self.login_session.email
+            self.login_session = None
+            __log__.info("logging out user: {}".format(email))
         else:
             # TODO: possibly through error instead
             __log__.error("cannot logout not logged in")
 
-    def login(self, username: str, password: str):
+    def login(self, email: str, password: str):
         """Login method"""
-        # TODO: validate login
-        self.login_member = Member(username, password)
-        __log__.info("logged in user: {}".format(username))
-
-    def check_logged_in(self):
-        if self.login_member:
-            return True
+        if self.login_session:
+            __log__.error("already logged in as user: {}".format(self.login_session.email))
         else:
-            __log__.error("you must be logged in to proceed!")
-            return False
+            user_hit = self.database.execute("select email, pwd from members where email = ? and pwd = ?",
+                                             (email.lower(), password)).fetchone()
+            if user_hit:
+                self.login_session = LoginSession(user_hit[0], user_hit[1])
+                __log__.info("logged in user: {}".format(user_hit[0]))
+            else:
+                __log__.warning("invalid login: bad username/password")
 
 
-class NotLoggedInException(Exception):
-    pass
+def parse(arg):
+    """Convert a series of zero or more numbers to an argument tuple"""
+    return tuple(arg.split())
 
 
 class ShellArgumentException(Exception):
@@ -184,37 +153,6 @@ class ShellArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         self.print_help(sys.stderr)
         raise ShellArgumentException(message)
-
-
-def price(price_string):
-    price = int(price_string)
-    if price < 0:
-        raise argparse.ArgumentTypeError(
-            "invalid price: {} (please choose a non negative price)".format(
-                price_string
-            )
-        )
-    return price
-
-
-def date(date_str):
-    return pendulum.parse(date_str)
-
-
-def get_post_ride_request_parser() -> ShellArgumentParser:
-    parser = ShellArgumentParser(
-        add_help=False,
-        description="Post a ride request")
-
-    parser.add_argument("date", type=date,
-                        help="Date the ride should start on")
-    parser.add_argument("pickup",
-                        help="The location code for the pickup location of the ride")
-    parser.add_argument("dropoff",
-                        help="The location code for the dropoff location of the ride")
-    parser.add_argument("price", type=price,
-                        help="The maximum amount you are willing to pay per seat for the ride")
-    return parser
 
 
 def get_cancel_booking_parser():
