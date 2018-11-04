@@ -18,7 +18,7 @@ __log__ = getLogger(__name__)
 LOG_LEVEL_STRINGS = ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
 
 
-def log_level(log_level_string):
+def log_level(log_level_string: str):
     if log_level_string not in LOG_LEVEL_STRINGS:
         raise argparse.ArgumentTypeError(
             "invalid choice: {} (choose from {})".format(
@@ -75,7 +75,7 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv=sys.argv[1:]):
+def main(argv=sys.argv[1:]) -> int:
     """main entry point mini-project-1"""
     parser = get_parser()
     args = parser.parse_args(argv)

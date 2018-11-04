@@ -17,6 +17,17 @@ from mini_project_1.loginsession import LoginSession
 __log__ = getLogger(__name__)
 
 
+def logged_in(f):
+    """Annotation to check if someone is logged in before attempting a
+    command in the :class:`.MainProjectShell`"""
+    def wrapper(*args):
+        if args[0].login_session:
+            return f(*args)
+        else:
+            __log__.error("you must be logged in to use this function")
+    return wrapper
+
+
 class MiniProjectShell(cmd.Cmd):
     """Main shell for mini-project-1"""
     intro = \
@@ -33,16 +44,27 @@ class MiniProjectShell(cmd.Cmd):
         super().__init__()
         self.database = database
 
+    def cmdloop(self, intro=None):
+        # start a login command at start.
+        self.do_login(None)
+        super().cmdloop()
+
     # ===============================
     # Shell command definitions
     # ===============================
 
     def do_login(self, arg):
         """Login to the mini-project-1 database: login"""
-        username = str(input("username: "))
-        password = getpass("password: ")
-        self.login(username, password)
+        if self.login_session:
+            __log__.error("already logged in")
+        else:
+            username = str(input("username: "))
+            password = getpass("password: ")
+            self.login(username, password)
+            while not self.login_session:
+                self.do_login(None)
 
+    @logged_in
     def do_logout(self, arg):
         """Logout to the mini-project-1 database: logout"""
         self.logout()
@@ -55,14 +77,17 @@ class MiniProjectShell(cmd.Cmd):
         self.database.close()
         return True
 
+    @logged_in
     def do_offer_ride(self, arg):
         """Offer a ride"""
         # TODO:
 
+    @logged_in
     def do_search_rides(self, arg):
         """Search for ride"""
         # TODO:
 
+    @logged_in
     def do_list_bookings(self, arg):
         """List all the bookings that the user offers"""
         cur = self.database.cursor()
@@ -75,10 +100,12 @@ class MiniProjectShell(cmd.Cmd):
         for row in rows:
             print(row)
 
+    @logged_in
     def do_book_member(self, arg):
         """Book other members on a ride"""
         # TODO:
 
+    @logged_in
     def do_cancel_booking(self, arg):
         """Cancel a booking"""
         cur = self.database.cursor()
@@ -91,37 +118,38 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid cancel_booking argument")
 
-    def help_cancel_bookings(self):
+    def help_cancel_booking(self):
         """Cancel a booking"""
         parser = get_cancel_booking_parser()
         parser.print_help()
 
+    @logged_in
     def do_post_ride_request(self, arg):
         """Post a ride request"""
-        if self.check_logged_in():
-            parser = get_post_ride_request_parser()
-            try:
-                args = parser.parse_args(arg.split())
+        parser = get_post_ride_request_parser()
+        try:
+            args = parser.parse_args(arg.split())
 
-                # generate a new rid
-                max_rid = self.database.execute("select max(r.rid) from requests r").fetchone()[0]
-                if not max_rid:
-                    max_rid = 0
-                rid = 1 + int(max_rid)
+            # generate a new rid
+            max_rid = self.database.execute("select max(r.rid) from requests r").fetchone()[0]
+            if not max_rid:
+                max_rid = 0
+            rid = 1 + int(max_rid)
 
-                # create and insert the new ride request
-                self.database.execute(
-                    "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)",
-                    (rid, self.login_session.get_email(), args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
-                self.database.commit()
-            except ShellArgumentException:
-                __log__.error("invalid post_ride_request argument")
+            # create and insert the new ride request
+            self.database.execute(
+                "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)",
+                (rid, self.login_session.get_email(), args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
+            self.database.commit()
+        except ShellArgumentException:
+            __log__.error("invalid post_ride_request argument")
 
     def help_post_ride_request(self):
         """Post a ride request's parsers help message"""
         parser = get_post_ride_request_parser()
         parser.print_help()
 
+    @logged_in
     def do_list_ride_requests(self, arg):
         """List all the user's ride requests"""
         cur = self.database.cursor()
@@ -133,10 +161,12 @@ class MiniProjectShell(cmd.Cmd):
         for row in rows:
             print(row)
 
+    @logged_in
     def do_search_ride_requests(self, arg):
         """Search for a ride request"""
         # TODO:
 
+    @logged_in
     def do_delete_ride_request(self, arg):
         """Delete a ride request"""
         # TODO:
@@ -145,14 +175,15 @@ class MiniProjectShell(cmd.Cmd):
     # Shell functionality definitions
     # ===============================
 
+    @logged_in
     def logout(self):
-        """Logout method"""
-        if self.login_session:
-            email = self.login_session.get_email()
-            self.login_session = None
-            __log__.info("logging out user: {}".format(email))
-        else:
-            __log__.error("cannot logout not logged in")
+        """Logout method
+
+        Set the shell's ``login_session`` to :obj:`None`.
+        """
+        email = self.login_session.get_email()
+        self.login_session = None
+        __log__.info("logged out user: {}".format(email))
 
     def login(self, email: str, password: str):
         """Login method
@@ -160,7 +191,7 @@ class MiniProjectShell(cmd.Cmd):
         Check if a :class:`LoginSession` already exists for the shell if not
         attempt to login with the given email and password.
 
-        If the login attempt is successful set the shell's login_session
+        If the login attempt is successful set the shell's ``login_session``
         to the newly created :class:`LoginSession`.
         """
         if self.login_session:
@@ -173,18 +204,6 @@ class MiniProjectShell(cmd.Cmd):
                 __log__.info("logged in user: {}".format(user_hit[0]))
             else:
                 __log__.warning("invalid login: bad username/password")
-
-    def check_logged_in(self):
-        """Check if a valid :class:`LoginSession` exists for the shell"""
-        if self.login_session:
-            return True
-        else:
-            __log__.error("you must be logged in to proceed!")
-            return False
-
-
-class NotLoggedInException(Exception):
-    pass
 
 
 class ShellArgumentException(Exception):
