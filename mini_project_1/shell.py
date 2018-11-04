@@ -6,16 +6,17 @@
 import argparse
 import sys
 import cmd
-import shlex
 import sqlite3
 from getpass import getpass
 from logging import getLogger
+
+import pendulum
+
 from mini_project_1.member import Member
 
 __log__ = getLogger(__name__)
 
 
-# TODO: maybe have a try catch structure for all commands invocation
 class MiniProjectShell(cmd.Cmd):
     """Main shell for mini-project-1"""
     intro = \
@@ -76,11 +77,22 @@ class MiniProjectShell(cmd.Cmd):
 
     def do_post_ride_request(self, arg):
         """Post a ride request"""
-        parser = get_post_ride_request_parser()
-        try:
-            args = parser.parse_args(arg.split())
-        except ShellArgumentException as e:
-            print(e)
+        if self.check_logged_in():
+            parser = get_post_ride_request_parser()
+            try:
+                args = parser.parse_args(arg.split())
+
+                # generate a new rid
+                max_rid = self.database.execute("select max(r.rid) from requests r").fetchone()[0]
+                if not max_rid:
+                    max_rid = 0
+
+                rid = 1 + int(max_rid)
+                # create and insert the new ride request
+                self.database.execute("INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)", (rid, self.login_member.username, args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
+                self.database.commit()
+            except ShellArgumentException as e:
+                print(e)
 
     def help_post_ride_request(self):
         """Post a ride request's parsers help message"""
@@ -119,6 +131,23 @@ class MiniProjectShell(cmd.Cmd):
         self.login_member = Member(username, password)
         __log__.info("logged in user: {}".format(username))
 
+    def check_logged_in(self):
+        if self.login_member:
+            return True
+        else:
+            __log__.error("you must be logged in to proceed!")
+            return False
+
+    # TODO: maybe have a try catch structure for all commands invocation
+    def get_login_user_email(self):
+        emails = self.database.execute("SELECT DISTINCT email FROM members where name = ? and pwd = ?", (self.login_member.username, self.login_member.password)).fetchall()
+        print(emails)
+        return emails[0]
+
+
+class NotLoggedInException(Exception):
+    pass
+
 
 class ShellArgumentException(Exception):
     def __init__(self, *args, **kwargs):
@@ -132,10 +161,10 @@ class ShellArgumentParser(argparse.ArgumentParser):
 
 
 def price(price_string):
-    price = float(price_string)
+    price = int(price_string)
     if price < 0:
         raise argparse.ArgumentTypeError(
-            "invalid price: {} (please choose a non negitive price)".format(
+            "invalid price: {} (please choose a non negative price)".format(
                 price_string
             )
         )
@@ -143,9 +172,7 @@ def price(price_string):
 
 
 def date(date_str):
-    import pendulum
-    date = pendulum.parse(date_str)
-    return date
+    return pendulum.parse(date_str)
 
 
 def get_post_ride_request_parser() -> ShellArgumentParser:
@@ -155,10 +182,10 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
 
     parser.add_argument("date", type=date,
                         help="Date the ride should start on")
-    parser.add_argument("pickup-location-code",
+    parser.add_argument("pickup",
                         help="The location code for the pickup location of the ride")
-    parser.add_argument("dropoff-location-code",
+    parser.add_argument("dropoff",
                         help="The location code for the dropoff location of the ride")
-    parser.add_argument("per-seat-price", type=price,
+    parser.add_argument("price", type=price,
                         help="The maximum amount you are willing to pay per seat for the ride")
     return parser
