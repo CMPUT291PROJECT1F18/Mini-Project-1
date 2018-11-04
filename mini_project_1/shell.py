@@ -72,8 +72,16 @@ class MiniProjectShell(cmd.Cmd):
         # TODO:
 
     def do_list_bookings(self, arg):
-        """List all of your bookings you offer"""
-        # TODO:
+        """List all your bookings you offer"""
+        cur = self.database.cursor()
+        list_bookings = 'SELECT DISTINCT bookings.* ' \
+                        'FROM bookings, rides ' \
+                        'WHERE rides.driver=? ' \
+                        'AND rides.rno=bookings.rno;'
+        cur.execute(list_bookings, (self.login_member.username,))
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
 
     def do_book_member(self, arg):
         """Book other members on a ride"""
@@ -212,7 +220,8 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
 def get_cancel_booking_parser():
     parser = ShellArgumentParser(
         add_help=False,
-        description="Test")
+        description="Cancel a booking")
 
-    parser.add_argument("bno", type=int, help="The booking identification number")
+    parser.add_argument("bno", type=int,
+                        help="The booking identification number")
     return parser
