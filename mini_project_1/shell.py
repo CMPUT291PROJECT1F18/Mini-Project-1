@@ -107,8 +107,8 @@ class MiniProjectShell(cmd.Cmd):
                     "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)",
                     (rid, self.login_member.username, args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
                 self.database.commit()
-            except ShellArgumentException as e:
-                __log__.error("invalid post_ride_request argument", e)
+            except ShellArgumentException:
+                __log__.error("invalid post_ride_request argument")
 
     def help_post_ride_request(self):
         """Post a ride request's parsers help message"""
@@ -201,6 +201,8 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
                         help="The location code for the dropoff location of the ride")
     parser.add_argument("price", type=price,
                         help="The maximum amount you are willing to pay per seat for the ride")
+    return parser
+
 
 def get_cancel_booking_parser():
     parser = ShellArgumentParser(
