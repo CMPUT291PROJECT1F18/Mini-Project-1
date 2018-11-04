@@ -48,13 +48,17 @@ def test_example(mock_db):
 def test_login(mock_db):
     database = sqlite3.connect(mock_db)
     shell = MiniProjectShell(database)
+    assert not shell.login_session
     shell.login("bob@123.ca", "foo")
     assert shell.login_session
+    assert shell.login_session.email == "bob@123.ca"
+    assert shell.login_session.password == "foo"
 
 
 def test_logout(mock_db):
     database = sqlite3.connect(mock_db)
     shell = MiniProjectShell(database)
+    assert not shell.login_session
     shell.login("bob@123.ca", "foo")
     assert shell.login_session
     shell.logout()
