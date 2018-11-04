@@ -73,7 +73,21 @@ class MiniProjectShell(cmd.Cmd):
 
     def do_cancel_booking(self, arg):
         """Cancel a booking"""
-        # TODO:
+        cur = self.database.cursor()
+        parser = get_cancel_booking_parser()
+        try:
+            args = parser.parse_args(arg.split())
+            delete_booking = 'DELETE FROM bookings WHERE bno=? AND email=?'
+            cur.execute(delete_booking, (args.bno, self.login_member.username,))
+            # TODO: Spit out messages for ineffective commands
+            # TODO: e.g. User has no rides, bno and email mismatch, etc.
+        except ShellArgumentException as e:
+            print(e)
+
+    def help_cancel_bookings(self):
+        """Cancel a booking"""
+        parser = get_cancel_booking_parser()
+        parser.print_help()
 
     def do_post_ride_request(self, arg):
         """Post a ride request"""
@@ -144,6 +158,10 @@ class MiniProjectShell(cmd.Cmd):
 class NotLoggedInException(Exception):
     pass
 
+def parse(arg):
+    """Convert a series of zero or more numbers to an argument tuple"""
+    return tuple(arg.split())
+
 
 class ShellArgumentException(Exception):
     def __init__(self, *args, **kwargs):
@@ -154,8 +172,7 @@ class ShellArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         self.print_help(sys.stderr)
         raise ShellArgumentException(message)
-
-
+        
 def price(price_string):
     price = int(price_string)
     if price < 0:
@@ -184,4 +201,11 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
                         help="The location code for the dropoff location of the ride")
     parser.add_argument("price", type=price,
                         help="The maximum amount you are willing to pay per seat for the ride")
+
+def get_cancel_booking_parser():
+    parser = ShellArgumentParser(
+        add_help=False,
+        description="Test")
+
+    parser.add_argument("bno", type=int, help="The booking identification number")
     return parser
