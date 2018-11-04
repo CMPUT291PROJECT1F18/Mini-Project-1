@@ -15,5 +15,5 @@ class LoginSession:
         self.email = email
         self.password = password
 
-    def get_email(self):
+    def get_email(self) -> str:
         return self.email
