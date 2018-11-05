@@ -11,7 +11,7 @@ import logging
 from logging import getLogger, basicConfig, Formatter
 from logging.handlers import TimedRotatingFileHandler
 
-from mini_project_1.register import email, phone, name, password
+from mini_project_1.register import email, phone, name, password, register_member
 from mini_project_1.shell import MiniProjectShell
 
 __log__ = getLogger(__name__)
@@ -87,6 +87,7 @@ def main(argv=sys.argv[1:]) -> int:
     """main entry point mini-project-1"""
     parser = get_parser()
     args = parser.parse_args(argv)
+    print(args)
 
     # configure logging
     handlers_ = []
@@ -121,6 +122,10 @@ def main(argv=sys.argv[1:]) -> int:
     __log__.info("connecting to mini-project-1 "
                  "database at: {}".format(args.database or args.init_database))
     conn = sqlite3.connect(args.database or args.init_database)
+
+    # attempt registration
+    if args.email and args.phone and args.name and args.password:
+        register_member(conn, args.email, args.name, args.phone, args.password)
 
     __log__.info("starting mini-project-1 shell")
     MiniProjectShell(conn).cmdloop()

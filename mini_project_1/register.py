@@ -42,7 +42,7 @@ def phone(phone_str: str) -> str:
 def email(email_str: str) -> str:
     """Argparse type validator for a member's email"""
     full_name, email_addr = parseaddr(email_str)
-    if not email_addr:
+    if not email_addr or "@" not in email_str[1:-3]:
         raise argparse.ArgumentTypeError("invalid email: please use format: name@addr")
     elif 15 < len(email_addr) < 3:
         raise argparse.ArgumentTypeError("invalid email length: choose between 3 to 15 characters")
@@ -60,8 +60,9 @@ def name(name_str: str) -> str:
 
 def register_member(database: sqlite3.Connection, email: str, name: str, phone: str, password: str):
     """Register a new member into the mini-project-1 database"""
+    # TODO: check might be bunk
     if check_valid_email(database, email):
-        database.execute("INSERT INTO members VALUES (?, ?, ?, ?)", email, name, phone, password)
+        database.execute("INSERT INTO members VALUES (?, ?, ?, ?)", (email, name, phone, password))
         database.commit()
     else:
-        __log__.error("email {} already taken: please choose an alternative".format(email))
+        raise Exception("email {} already taken: please choose an alternative".format(email))
