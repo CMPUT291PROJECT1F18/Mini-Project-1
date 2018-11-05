@@ -280,7 +280,7 @@ class MiniProjectShell(cmd.Cmd):
                 send_message(self.database, args.email, self.login_session.get_email(),
                              "I have booked you on a ride", rno)
         except ShellArgumentException:
-            __log__.exception("invalid cancel_booking argument")
+            __log__.error("invalid book_member argument")
 
     def help_book_member(self):
         """Parser help message for booking a member"""
