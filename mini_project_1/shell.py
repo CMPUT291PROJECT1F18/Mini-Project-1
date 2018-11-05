@@ -15,15 +15,15 @@ from mini_project_1.cancel_booking import get_cancel_booking_parser
 from mini_project_1.common import ShellArgumentException, \
     MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, get_selection, send_message, check_valid_email, \
     check_valid_lcode
-from mini_project_1.delete_ride_request import get_delete_ride_request_parser
+from mini_project_1.delete_request import get_delete_request_parser
 from mini_project_1.loginsession import LoginSession
 from mini_project_1.offer_ride import get_offer_ride_parser, check_valid_cno, offer_ride
-from mini_project_1.post_ride_request import get_post_ride_request_parser
-from mini_project_1.search_ride_requests import \
-    get_search_ride_requests_by_city_name_parser, \
-    get_search_ride_requests_by_location_code_parser
+from mini_project_1.post_request import get_post_request_parser
+from mini_project_1.search_requests import \
+    get_search_requests_city_parser, \
+    get_search_requests_lcode_parser, print_5_and_prompt
 from mini_project_1.search_rides import get_search_for_ride_parser
-from mini_project_1.select_ride_request import get_select_ride_request_parser
+from mini_project_1.select_request import get_select_request_parser
 
 __log__ = getLogger(__name__)
 
@@ -99,21 +99,25 @@ class MiniProjectShell(cmd.Cmd):
         inbox_items = self.database.execute(
             "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
             "FROM inbox "
-            "WHERE inbox.email = ?",
+            "WHERE inbox.email = ? AND inbox.seen = 'n'",
             (self.login_session.get_email(),)
         ).fetchall()
-        print("Your inbox:")
-        for inbox_item in inbox_items:
-            print(inbox_item)
 
-        # set all messages within your inbox as seen="y"
-        self.database.execute(
-            "UPDATE inbox "
-            "SET seen='y' " 
-            "WHERE inbox.email = ?",
-            (self.login_session.get_email(),)
-        )
-        self.database.commit()
+        if inbox_items:
+            print("Your inbox:")
+            for inbox_item in inbox_items:
+                print(inbox_item)
+
+            # set all messages within your inbox as seen="y"
+            self.database.execute(
+                "UPDATE inbox "
+                "SET seen='y' " 
+                "WHERE inbox.email = ?",
+                (self.login_session.get_email(),)
+            )
+            self.database.commit()
+        else:
+            print("No new messages")
 
     @logged_in
     def do_offer_ride(self, arg):
@@ -223,13 +227,12 @@ class MiniProjectShell(cmd.Cmd):
             (self.login_session.get_email(),)
         )
         rows = cur.fetchall()
-        for row in rows:  # TODO: list max of five (get_selection(rows, ""))
+        for row in rows:
             print(row)
 
     @logged_in
     def do_book_member(self, arg):
         """Book other members on a ride"""
-        cur = self.database.cursor()
         parser = get_book_member_parser()
 
         try:
@@ -280,7 +283,7 @@ class MiniProjectShell(cmd.Cmd):
                 send_message(self.database, args.email, self.login_session.get_email(),
                              "I have booked you on a ride", rno)
         except ShellArgumentException:
-            __log__.exception("invalid cancel_booking argument")
+            __log__.error("invalid book_member argument")
 
     def help_book_member(self):
         """Parser help message for booking a member"""
@@ -324,16 +327,12 @@ class MiniProjectShell(cmd.Cmd):
 
             self.database.commit()
             print("Successfully deleted:\n{}".format(to_delete))
-
-            send_message = "INSERT INTO inbox VALUES " \
-                           "(?, ?, ?, ?, ?, ?);"
-            cur.execute(send_message,
-                        (to_delete[1],
-                         pendulum.now().to_datetime_string(),
-                         self.login_session.get_email(),
-                         "Your booking has been cancelled.",
-                         to_delete[2],
-                         "n"))
+            cur.execute(
+                "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);",
+                (to_delete[1], pendulum.now().to_datetime_string(),
+                 self.login_session.get_email(), "Your booking has been cancelled.",
+                 to_delete[2], "n")
+            )
             self.database.commit()
             print("Successfully sent cancellation message to {}."
                   .format(to_delete[1]))
@@ -346,9 +345,9 @@ class MiniProjectShell(cmd.Cmd):
         parser.print_help()
 
     @logged_in
-    def do_post_ride_request(self, arg):
+    def do_post_request(self, arg):
         """Post a ride request"""
-        parser = get_post_ride_request_parser()
+        parser = get_post_request_parser()
         try:
             args = parser.parse_args(arg.split())
 
@@ -383,13 +382,13 @@ class MiniProjectShell(cmd.Cmd):
                 )
             )
 
-    def help_post_ride_request(self):
+    def help_post_request(self):
         """Post a ride request's parsers help message"""
-        parser = get_post_ride_request_parser()
+        parser = get_post_request_parser()
         parser.print_help()
 
     @logged_in
-    def do_list_ride_requests(self, arg):
+    def do_list_requests(self, arg):
         """List all the user's ride requests"""
         cur = self.database.cursor()
         cur.execute(
@@ -399,14 +398,14 @@ class MiniProjectShell(cmd.Cmd):
             (self.login_session.get_email().lower(),)
         )
         rows = cur.fetchall()
-        for row in rows: # TODO: list max of five (get_selection(rows, ""))
+        for row in rows:
             print(row)
 
     @logged_in
-    def do_search_ride_requests_by_location_code(self, arg):
+    def do_search_requests_lcode(self, arg):
         """Search for a ride request by location number"""
         cur = self.database.cursor()
-        parser = get_search_ride_requests_by_location_code_parser()
+        parser = get_search_requests_lcode_parser()
 
         try:
             args = parser.parse_args(arg.split())
@@ -421,16 +420,16 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid argument")
 
-    def help_search_ride_requests_by_location_code(self):
+    def help_search_requests_lcode(self):
         """Parser help message for searching ride requests by location code"""
-        parser = get_search_ride_requests_by_location_code_parser()
+        parser = get_search_requests_lcode_parser()
         parser.print_help()
 
     @logged_in
-    def do_search_ride_requests_by_city_name(self, arg):
+    def do_search_requests_city(self, arg):
         """Search for a ride quest by city name"""
         cur = self.database.cursor()
-        parser = get_search_ride_requests_by_city_name_parser()
+        parser = get_search_requests_city_parser()
 
         try:
             args = parser.parse_args(arg.split())
@@ -446,16 +445,16 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid argument")
 
-    def help_search_ride_requests_by_city_name(self):
+    def help_search_requests_city(self):
         """Parser help message for searching ride requests by city name"""
-        parser = get_search_ride_requests_by_city_name_parser()
+        parser = get_search_requests_city_parser()
         parser.print_help()
 
     @logged_in
-    def do_delete_ride_request(self, arg):
+    def do_delete_request(self, arg):
         """Delete a ride request"""
         cur = self.database.cursor()
-        parser = get_delete_ride_request_parser()
+        parser = get_delete_request_parser()
 
         try:
             args = parser.parse_args(arg.split())
@@ -471,7 +470,7 @@ class MiniProjectShell(cmd.Cmd):
                 print("You don't have a ride request where rid={}"
                       .format(args.rid))
                 print("Your requests:")
-                self.do_list_ride_requests(self)
+                self.do_list_requests(self)
                 return
 
             cur.execute(
@@ -486,16 +485,16 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid argument")
 
-    def help_delete_ride_request(self):
+    def help_delete_request(self):
         """Parser help message for deleting a ride request"""
-        parser = get_delete_ride_request_parser()
+        parser = get_delete_request_parser()
         parser.print_help()
 
     @logged_in
-    def do_select_ride_request(self, arg):
+    def do_select_request(self, arg):
         """Select a ride request and perform actions"""
         cur = self.database.cursor()
-        parser = get_select_ride_request_parser()
+        parser = get_select_request_parser()
 
         try:
             args = parser.parse_args(arg.split())
@@ -537,9 +536,9 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid argument")
 
-    def help_select_ride_request(self):
+    def help_select_request(self):
         """Parser help message for selecting a ride request"""
-        parser = get_select_ride_request_parser()
+        parser = get_select_request_parser()
         parser.print_help()
 
     # ===============================
@@ -600,25 +599,3 @@ class MiniProjectShell(cmd.Cmd):
             raise ShellArgumentException(
                 "invalid location code: {}".format(location_code_str))
 
-
-def print_5_and_prompt(rows):
-    if len(rows) > 5:
-        index = 0
-        while index < len(rows)-1:
-            end_index = min(index + 5, len(rows)-1)
-            print("Rows {}-{}:".format(index+1, end_index))
-            for row in rows[index:end_index]:
-                print(row)
-            if end_index == len(rows)-1:
-                break
-            see_more = input(
-                "Enter 'more' to see 5 more results or enter "
-                "anything else to finish.\n").lower()
-            if see_more != "more":
-                break
-            else:
-                index = index + 5
-    else:
-        print("All rows:")
-        for row in rows:
-            print(row)

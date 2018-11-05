@@ -11,15 +11,17 @@ Scripts:
  + :mod:`.__main__` - argparse entry point
  + :mod:`.register` - mini-project-1 member registration
 Modules:
- + :mod:`.shell` - command shell
- + :mod:`.loginsession` - login session object definition
- + :mod:`.ride` - advanced ride offering logic
- + :mod:`.delete_ride_request`
- + :mod:`.post_ride_request`
- + :mod:`.search_ride_request`
- + :mod:`.select_ride_request`
- + :mod:`.cancel_booking`
+ + :mod:`.book_member` -
+ + :mod:`.cancel_booking` -
  + :mod:`.common` - common functionality used in mini-project-1
+ + :mod:`.delete_ride_request` -
+ + :mod:`.loginsession` - login session object definition
+ + :mod:`.offer_ride` -
+ + :mod:`.post_ride_request` -
+ + :mod:`.search_ride_requests` -
+ + :mod:`.search_rides` -
+ + :mod:`.select_ride_request` -
+ + :mod:`.shell` - command shell
 """
 
 __version__ = (0, 0, 0)
