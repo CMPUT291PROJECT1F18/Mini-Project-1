@@ -71,7 +71,7 @@ def test_check_valid_email(mock_db):
     database = sqlite3.connect(mock_db)
 
     # check for a valid new unique email
-    assert valid_email(database, "crazyuniqueemail@example.com")
+    assert valid_email(database, "cra@example.com")
 
     # check for a invalid new unique email
     assert not valid_email(database, "bob@123.ca")
