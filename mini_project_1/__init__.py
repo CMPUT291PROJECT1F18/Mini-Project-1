@@ -9,13 +9,13 @@ sharing applications.
 
 Scripts:
  + :mod:`.__main__` - argparse entry point
- + :mod:`.register` - mini-project-1 member registration
 Modules:
  + :mod:`.shell` - command shell
  + :mod:`.loginsession` - login session object definition
  + :mod:`.ride` - advanced ride offering logic
  + :mod:`.delete_ride_request`
  + :mod:`.post_ride_request`
+ + :mod:`.register` - mini-project-1 member registration
  + :mod:`.search_ride_request`
  + :mod:`.select_ride_request`
  + :mod:`.cancel_booking`

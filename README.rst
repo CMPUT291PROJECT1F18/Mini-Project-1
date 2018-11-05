@@ -58,10 +58,3 @@ console command:
 .. code-block:: bash
 
     mini-project-1 --help
-
-To get help on registering a new member to a mini-project-1 database
-run the following console command:
-
-.. code-block:: base
-
-    mini-project-register --help
