@@ -13,6 +13,6 @@ def get_select_request_parser() -> ShellArgumentParser:
     )
 
     parser.add_argument("rid", type=int,
-                        help="The ID of the ride request to delete")
+                        help="The ID of the ride request")
 
     return parser
