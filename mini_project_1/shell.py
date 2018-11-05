@@ -158,11 +158,13 @@ class MiniProjectShell(cmd.Cmd):
             # display matching
             if len(results):
                 selection = get_selection(results)
-            # message the posting ride member
-            if selection:
-                send_message(self.database, selection[7], self.login_session.get_email(),
-                             "I want to book seats on this ride", selection[0])
-                print("Message sent to driver")
+                # message the posting ride member
+                if selection:
+                    send_message(self.database, selection[7], self.login_session.get_email(),
+                                 "I want to book seats on this ride", selection[0])
+                    print("Message sent to driver")
+            else:
+                print("No results")
         except ShellArgumentException:
             __log__.error("invalid offer_ride argument")
 
