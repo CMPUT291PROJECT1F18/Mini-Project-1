@@ -155,7 +155,8 @@ class MiniProjectShell(cmd.Cmd):
                 "AND bookings.rno = rides.rno",
                 (args.bno, self.login_session.get_email(),)
             )
-            to_delete = cur.fetchall()
+            to_delete = cur.fetchone()
+
 
             if len(to_delete) == 0:
                 print("You don't have a booking where bno={}".format(args.bno))
@@ -175,8 +176,20 @@ class MiniProjectShell(cmd.Cmd):
                 (args.bno, self.login_session.get_email(),)
             )
             self.database.commit()
-
             print("Successfully deleted:\n{}".format(to_delete))
+
+            send_message = "INSERT INTO inbox VALUES " \
+                           "(?, ?, ?, ?, ?, ?);"
+            cur.execute(send_message,
+                        (to_delete[1],
+                         pendulum.now().to_datetime_string(),
+                         self.login_session.get_email(),
+                         "Your booking has been cancelled.",
+                         to_delete[2],
+                         "n"))
+            self.database.commit()
+            print("Successfully sent cancellation message to {}."
+                  .format(to_delete[1]))
         except ShellArgumentException:
             __log__.exception("invalid cancel_booking argument")
 
