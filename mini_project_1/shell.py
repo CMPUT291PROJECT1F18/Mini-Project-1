@@ -100,7 +100,7 @@ class MiniProjectShell(cmd.Cmd):
         inbox_items = self.database.execute(
             "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
             "FROM inbox "
-            "WHERE inbox.email = ?",
+            "WHERE inbox.email = ? AND inbox.seen = 'n'",
             (self.login_session.get_email(),)
         ).fetchall()
         print("Your inbox:")
