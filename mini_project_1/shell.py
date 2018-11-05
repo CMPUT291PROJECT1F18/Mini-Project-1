@@ -499,7 +499,7 @@ class MiniProjectShell(cmd.Cmd):
                 'SELECT DISTINCT requests.* '
                 'FROM requests, locations '
                 'WHERE requests.pickup = locations.lcode '
-                'AND locations.city = ?',
+                'AND locations.city LIKE ?',
                 (args.city.lower(),)
             )
             rows = cur.fetchall()
