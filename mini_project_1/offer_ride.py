@@ -51,7 +51,10 @@ def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulu
     :return: if a ride has been added (True/False)
     """
     dbcursor = database.cursor()
-    dbcursor.execute("SELECT MAX(rno) FROM rides")
+    dbcursor.execute(
+        "SELECT MAX(rno) "
+        "FROM rides"
+    )
     rno = str(int(dbcursor.fetchone()[0]) + 1)
 
     try:
