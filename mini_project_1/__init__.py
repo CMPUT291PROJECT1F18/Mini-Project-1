@@ -7,6 +7,8 @@ Scripts:
  + :mod:`.__main__` - argparse entry point
 Modules:
  + :mod:`.shell` - main command shell
+ + :mod:`.loginsession` - login session object definition
+ + :mod:`.ride` - advanced ride offering logic
 """
 
 __version__ = (0, 0, 0)
