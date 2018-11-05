@@ -45,6 +45,10 @@ def test_example(mock_db):
     database = sqlite3.connect(mock_db)
     print(database.execute("""SELECT name FROM members""").fetchall())
 
+###############################
+# tests related to shell.py
+###############################
+
 
 def test_login(mock_db):
     database = sqlite3.connect(mock_db)
@@ -65,6 +69,25 @@ def test_logout(mock_db):
     assert shell.login_session
     shell.logout()
     assert not shell.login_session
+
+
+def test_help_messsages(mock_db):
+    """Test all the shell's ``help_<command>`` methods
+
+    Ensure that they can be called without raising an exception.
+    """
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+
+    shell.help_book_member()
+    shell.help_cancel_booking()
+    shell.help_delete_request()
+    shell.help_search_requests_lcode()
+    shell.help_search_requests_city()
+    shell.help_search_rides()
+    shell.help_select_request()
+    shell.help_post_request()
+    shell.help_offer_ride()
 
 
 ###############################
