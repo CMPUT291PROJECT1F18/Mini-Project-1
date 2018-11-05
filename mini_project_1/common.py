@@ -51,11 +51,12 @@ class ValueNotFoundException(Exception):
         super().__init__(self, *args, **kwargs)
 
 
-def get_selection(items: list):
+def get_selection(items: list, prompt: str= "Enter selection number: "):
     """Gets the user to select a item from a list, displaying up to 5 items
     at a time.
 
     :param items: list of items
+    :param prompt: a prompt for user input, default is "Enter selection number: "
     :return: selected item from items
     """
     index = 0
@@ -64,7 +65,7 @@ def get_selection(items: list):
 
         if index % 5 == 4:
             print("Press Enter to see more\n")
-            selection = str(input("Enter selection number: "))
+            selection = str(input(prompt))
 
             if selection.isnumeric():
                 selection = int(selection)
@@ -74,7 +75,7 @@ def get_selection(items: list):
                 return None
         elif index + 1 == len(items):
             print("Press Enter to return to the start of the list\n")
-            selection = str(input("Enter selection number: "))
+            selection = str(input(prompt))
 
             if selection.isnumeric():
                 selection = int(selection)
@@ -124,3 +125,23 @@ def send_message(database: sqlite3.Connection, recipient: str, sender: str, cont
                 (recipient, pendulum.now().to_datetime_string(),
                  sender, content, rno, "n"))
     database.commit()
+
+
+def check_valid_lcode(database: sqlite3.Connection, lcode: str):
+    """Checks whether a lcode is in the database"""
+    dbcursor = database.cursor()
+    dbcursor.execute(
+        "SELECT * FROM locations WHERE lcode = ?", (lcode,))
+    if dbcursor.fetchall():
+        return True
+    return False
+
+
+def check_valid_email(database: sqlite3.Connection, email: str):
+    """Checks whether an email is in the database"""
+    dbcursor = database.cursor()
+    dbcursor.execute(
+        "SELECT * FROM members WHERE email = ?", (email,))
+    if dbcursor.fetchall():
+        return True
+    return False
