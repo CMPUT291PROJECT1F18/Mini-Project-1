@@ -8,7 +8,6 @@ import pendulum
 
 from mini_project_1.loginsession import LoginSession
 
-
 """
 Offer a ride.
 The member should be able to offer rides by providing a date, the number of seats offered,
@@ -18,6 +17,7 @@ The member should have the option of adding a car number and any set of enroute 
 
 
 class ValueNotFoundException(Exception):
+    """Exception for queries with no results"""
     def __init__(self, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
 
@@ -58,7 +58,7 @@ def get_selection(items: list):
         index += 1
 
 
-def get_location_id(dbcursor: sqlite3.Cursor, keyword: str, prompt:str = None):
+def get_location_id(dbcursor: sqlite3.Cursor, keyword: str, prompt: str = None):
     """Gets a location lcode from the user."""
 
     # get exact match locde
@@ -83,20 +83,21 @@ def get_location_id(dbcursor: sqlite3.Cursor, keyword: str, prompt:str = None):
     elif locations:
         return locations[0][0]
     else:
-        raise ValueNotFoundException("No location for "+keyword)
+        raise ValueNotFoundException("No location for " + keyword)
 
 
 def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: LoginSession):
     """Returns whether a member has a car number cno in the database with
     cursor dbcursor"""
     dbcursor.execute("SELECT cno FROM cars WHERE cno = ? AND owner = ?", (cno, member.get_email()))
-    if len(dbcursor.fetchall()):
+    if dbcursor.fetchall():
         return True
     return False
 
 
-def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulum.DateTime, seats: int,
-               price: int, luggage: str, source: str, destination: str, cno: str = None, enroute: set = set()):
+def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulum.DateTime,
+               seats: int, price: int, luggage: str, source: str, destination: str,
+               cno: str = None, enroute: set = set()):
     """
     Tries to add a ride to the database for the member
     :return: if a ride has been added (True/False)
@@ -111,7 +112,8 @@ def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulu
     try:
         dbcursor.execute(
             "INSERT INTO rides (rno, price, rdate, seats, lugDesc, src, dst, driver) VALUES " +
-            "(?, ?, ?, ?, ?, ?, ?, ?)", (rno, price, date, seats, luggage, source, destination, member.get_email()))
+            "(?, ?, ?, ?, ?, ?, ?, ?)",
+            (rno, price, date, seats, luggage, source, destination, member.get_email()))
 
         if cno:
             dbcursor.execute("UPDATE rides SET cno = ? WHERE rno = ?", (cno, rno))
@@ -187,43 +189,3 @@ matching the location code or the city entered. If there are more than 5
 matches, at most 5 matches will be shown at a time. The member should be 
 able to select a request and message the posting member, for example asking 
 the member to check out a ride. """
-
-if __name__ == "__main__":
-    conn = sqlite3.connect("test2.db")
-    test_dbcursor = conn.cursor()
-
-    # test_dbcursor.executescript(open("data/create_tables.sql", "r").read())
-    # test_dbcursor.executescript(open("data/create_data.sql", "r").read())
-    # conn.commit()
-    test_dbcursor.execute(
-        "SELECT * FROM rides Where rno > 42")
-
-    edm_location = test_dbcursor.fetchall()
-    print(edm_location)
-    test_dbcursor.execute(
-        "SELECT * FROM enroute Where rno > 42")
-
-    edm_location = test_dbcursor.fetchall()
-    print(edm_location)
-    print("-----------------")
-    try:
-        offer_ride(conn, LoginSession("jane_doe@abc.ca", "passyW"))
-    except LookupError:
-        pass
-    except ConnectionAbortedError:
-        pass
-
-    test_dbcursor.execute(
-        "SELECT * FROM rides Where rno > 42")
-
-    edm_location = test_dbcursor.fetchall()
-    print(edm_location)
-    test_dbcursor.execute(
-        "SELECT * FROM enroute Where rno > 42")
-
-    edm_location = test_dbcursor.fetchall()
-    print(edm_location)
-
-    test_dbcursor.close()
-    # conn.commit()
-    conn.close()  # <--- Close the connection..
