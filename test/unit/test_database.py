@@ -67,6 +67,11 @@ def test_logout(mock_db):
     assert not shell.login_session
 
 
+###############################
+# tests related to register.py
+###############################
+
+
 def test_check_valid_email_valid(mock_db):
     database = sqlite3.connect(mock_db)
     # check for a valid new unique email
