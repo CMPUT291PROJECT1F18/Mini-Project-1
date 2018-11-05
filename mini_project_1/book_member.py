@@ -47,5 +47,10 @@ def book_member(database: sqlite3.Connection, rno: int, email: str, seats: int,
     dbcursor = database.cursor()
     dbcursor.execute("Select MAX(bno) from bookings")
     bno = int(dbcursor.fetchone()[0]) + 1
-    dbcursor.execute("INSERT into Bookings values(?,?,?,?,?,?,?)", (bno, email, rno, seat_price, seats, src, dst))
-    database.commit()
+    try:
+        dbcursor.execute("INSERT into Bookings values(?,?,?,?,?,?,?)", (bno, email, rno, seat_price, seats, src, dst))
+        database.commit()
+        print("Booking added")
+    except sqlite3.InterfaceError:
+        return False
+    return True

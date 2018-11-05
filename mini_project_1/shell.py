@@ -231,9 +231,9 @@ class MiniProjectShell(cmd.Cmd):
         """Book other members on a ride"""
         cur = self.database.cursor()
         parser = get_book_member_parser()
+
         try:
             args = parser.parse_args(arg.split())
-
             # ensure valid inputs
             if not check_valid_lcode(self.database, args.pickup):
                 print("Pickup locde not valid")
@@ -254,7 +254,7 @@ class MiniProjectShell(cmd.Cmd):
                 (self.login_session.get_email(),)
             )
             rows = cur.fetchall()
-            ride = get_selection(rows)
+            ride = get_selection(rows, "Enter the row number for the ride: ")
             rno = ride[0]
             seats_available = ride[3]
 
@@ -265,25 +265,22 @@ class MiniProjectShell(cmd.Cmd):
                 'WHERE bookings.rno = ?;',
                 (rno,)
             )
-            seats_taken = cur.fetchone()
-            print(seats_taken)
+            seats_taken = cur.fetchone()[0]
             if not seats_taken:
                 seats_taken = 0
 
             # book seats if available or user accepts overbooking
             if seats_available < seats_taken + args.seats:
                 if str(input("Warning: ride will be overbooked. Continue: [y] or [n]") == 'y'):
-                    book_member(self.database, ride, args.email, args.seats, args.price, args.pickup, args.dropoff)
+                    book_member(self.database, rno, args.email, args.seats, args.price, args.pickup, args.dropoff)
                     send_message(self.database, args.email, self.login_session.get_email(),
                                  "I have booked you on a ride", rno)
             else:
-                book_member(self.database, ride, args.email, args.seats, args.price, args.pickup, args.dropoff)
+                book_member(self.database, rno, args.email, args.seats, args.price, args.pickup, args.dropoff)
                 send_message(self.database, args.email, self.login_session.get_email(),
                              "I have booked you on a ride", rno)
-
         except ShellArgumentException:
             __log__.exception("invalid cancel_booking argument")
-        pass
 
     def help_book_member(self):
         """Parser help message for booking a member"""
@@ -583,7 +580,7 @@ class MiniProjectShell(cmd.Cmd):
             else:
                 __log__.warning("invalid login: bad username/password")
 
-    # TODO: this should be moved outside if possible
+    # TODO: this should be moved outside if possible - see check_valid_lcode in common
     def validate_location_code(self, location_code_str: str):
         """Validate that a location ode for use in ``post_ride_request``
         command actually exists in locations
