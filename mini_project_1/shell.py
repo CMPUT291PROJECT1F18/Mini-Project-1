@@ -95,7 +95,8 @@ class MiniProjectShell(cmd.Cmd):
             "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
             "FROM inbox "
             "WHERE inbox.email = ?",
-            (self.login_session.get_email(),)).fetchall()
+            (self.login_session.get_email(),)
+        ).fetchall()
         print("Your inbox:")
         for inbox_item in inbox_items:
             print(inbox_item)
@@ -105,7 +106,8 @@ class MiniProjectShell(cmd.Cmd):
             "UPDATE inbox "
             "SET seen='y' " 
             "WHERE inbox.email = ?",
-            (self.login_session.get_email(),))
+            (self.login_session.get_email(),)
+        )
         self.database.commit()
 
     @logged_in
@@ -122,11 +124,13 @@ class MiniProjectShell(cmd.Cmd):
     def do_list_bookings(self, arg):
         """List all the bookings that the user offers"""
         cur = self.database.cursor()
-        list_bookings = 'SELECT DISTINCT bookings.* ' \
-                        'FROM bookings, rides ' \
-                        'WHERE rides.driver=? ' \
-                        'AND rides.rno=bookings.rno;'
-        cur.execute(list_bookings, (self.login_session.get_email(),))
+        cur.execute(
+            'SELECT DISTINCT bookings.* '
+            'FROM bookings, rides '
+            'WHERE rides.driver = ? '
+            'AND rides.rno = bookings.rno;',
+            (self.login_session.get_email(),)
+        )
         rows = cur.fetchall()
         for row in rows:
             print(row)
@@ -143,13 +147,14 @@ class MiniProjectShell(cmd.Cmd):
         parser = get_cancel_booking_parser()
         try:
             args = parser.parse_args(arg.split())
-
-            booking_to_delete = "SELECT bookings.* FROM bookings, rides " \
-                                "WHERE bookings.bno=? " \
-                                "AND rides.driver=? " \
-                                "AND bookings.rno = rides.rno;"
-            cur.execute(booking_to_delete,
-                        (args.bno, self.login_session.get_email(),))
+            cur.execute(
+                "SELECT bookings.* "
+                "FROM bookings, rides "
+                "WHERE bookings.bno = ? "
+                "AND rides.driver = ? "
+                "AND bookings.rno = rides.rno",
+                (args.bno, self.login_session.get_email(),)
+            )
             to_delete = cur.fetchall()
 
             if len(to_delete) == 0:
@@ -158,16 +163,17 @@ class MiniProjectShell(cmd.Cmd):
                 self.do_list_bookings(self)
                 return
 
-            cancel_booking = "DELETE FROM bookings " \
-                             "WHERE EXISTS(" \
-                             "SELECT * FROM bookings b2, rides " \
-                             "WHERE b2.bno=?" \
-                             "AND bookings.bno=b2.bno " \
-                             "AND rides.driver=?" \
-                             "AND b2.rno = rides.rno);"
-            
-            cur.execute(cancel_booking,
-                        (args.bno, self.login_session.get_email(),))
+            cur.execute(
+                "DELETE FROM bookings "
+                "WHERE EXISTS("
+                "SELECT * "
+                "FROM bookings b2, rides "
+                "WHERE b2.bno = ?"
+                "AND bookings.bno = b2.bno "
+                "AND rides.driver = ?"
+                "AND b2.rno = rides.rno)",
+                (args.bno, self.login_session.get_email(),)
+            )
             self.database.commit()
 
             print("Successfully deleted:\n{}".format(to_delete))
@@ -187,7 +193,8 @@ class MiniProjectShell(cmd.Cmd):
             args = parser.parse_args(arg.split())
 
             # generate a new rid
-            max_rid = self.database.execute("select max(r.rid) from requests r").fetchone()[0]
+            max_rid = self.database.execute(
+                "select max(r.rid) from requests r").fetchone()[0]
             if not max_rid:
                 max_rid = 0
             rid = 1 + int(max_rid)
@@ -199,13 +206,21 @@ class MiniProjectShell(cmd.Cmd):
             # create and insert the new ride request
             self.database.execute(
                 "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)",
-                (rid, self.login_session.get_email(), args.date.strftime(MINI_PROJECT_DATE_FMT), args.pickup, args.dropoff, args.price))
+                (rid, self.login_session.get_email(),
+                 args.date.strftime(MINI_PROJECT_DATE_FMT),
+                 args.pickup, args.dropoff, args.price)
+            )
             self.database.commit()
         except ShellArgumentException:
             __log__.exception("invalid post_ride_request argument")
         else:
-            __log__.info("succesfully posted ride request: rid: {} email: {} date: {} pickup: {} dropoff: {} price: {}".format(
-                rid, self.login_session.get_email(), args.date.strftime(MINI_PROJECT_DATE_FMT), args.pickup, args.dropoff, args.price)
+            __log__.info(
+                "succesfully posted ride request: "
+                "rid: {} email: {} date: {} pickup: {} dropoff: {} price: {}".format(
+                    rid, self.login_session.get_email(),
+                    args.date.strftime(MINI_PROJECT_DATE_FMT),
+                    args.pickup, args.dropoff, args.price
+                )
             )
 
     def help_post_ride_request(self):
@@ -217,10 +232,12 @@ class MiniProjectShell(cmd.Cmd):
     def do_list_ride_requests(self, arg):
         """List all the user's ride requests"""
         cur = self.database.cursor()
-        list_requests = 'SELECT DISTINCT * ' \
-                        'FROM requests ' \
-                        'WHERE email=?;'
-        cur.execute(list_requests, (self.login_session.get_email().lower(),))
+        cur.execute(
+            'SELECT DISTINCT * ' 
+            'FROM requests ' 
+            'WHERE email = ?',
+            (self.login_session.get_email().lower(),)
+        )
         rows = cur.fetchall()
         for row in rows:
             print(row)
@@ -233,10 +250,12 @@ class MiniProjectShell(cmd.Cmd):
 
         try:
             args = parser.parse_args(arg.split())
-            list_requests = 'SELECT DISTINCT requests.* ' \
-                            'FROM requests ' \
-                            'WHERE pickup=?;'
-            cur.execute(list_requests, (args.lcode,))
+            cur.execute(
+                'SELECT DISTINCT requests.* '
+                'FROM requests '
+                'WHERE pickup = ?',
+                (args.lcode,)
+            )
             rows = cur.fetchall()
             print_5_and_prompt(rows)
         except ShellArgumentException:
@@ -255,11 +274,13 @@ class MiniProjectShell(cmd.Cmd):
 
         try:
             args = parser.parse_args(arg.split())
-            list_requests = 'SELECT DISTINCT requests.* ' \
-                            'FROM requests, locations ' \
-                            'WHERE requests.pickup=locations.lcode ' \
-                            'AND locations.city=?;'
-            cur.execute(list_requests, (args.city.lower(),))
+            cur.execute(
+                'SELECT DISTINCT requests.* '
+                'FROM requests, locations '
+                'WHERE requests.pickup = locations.lcode '
+                'AND locations.city = ?',
+                (args.city.lower(),)
+            )
             rows = cur.fetchall()
             print_5_and_prompt(rows)
         except ShellArgumentException:
@@ -278,12 +299,12 @@ class MiniProjectShell(cmd.Cmd):
 
         try:
             args = parser.parse_args(arg.split())
-
-            request_to_delete = "SELECT DISTINCT * FROM requests " \
-                                "WHERE rid=? " \
-                                "AND email=?;"
-            cur.execute(request_to_delete,
-                        (args.rid, self.login_session.get_email(),))
+            cur.execute(
+                "SELECT DISTINCT * "
+                "FROM requests " 
+                "WHERE rid = ? AND email = ?",
+                (args.rid, self.login_session.get_email(),)
+            )
             to_delete = cur.fetchall()
 
             if len(to_delete) == 0:
@@ -293,12 +314,12 @@ class MiniProjectShell(cmd.Cmd):
                 self.do_list_ride_requests(self)
                 return
 
-            cancel_request = "DELETE FROM requests " \
-                             "WHERE rid=? " \
-                             "AND email=?;"
-
-            cur.execute(cancel_request,
-                        (args.rid, self.login_session.get_email(),))
+            cur.execute(
+                "DELETE "
+                "FROM requests "
+                "WHERE rid = ? AND email = ?",
+                (args.rid, self.login_session.get_email(),)
+            )
             self.database.commit()
 
             print("Successfully deleted:\n{}".format(to_delete))
@@ -317,10 +338,12 @@ class MiniProjectShell(cmd.Cmd):
         
         try:
             args = parser.parse_args(arg.split())
-            
-            select_request = "SELECT * FROM requests " \
-                             "WHERE rid=?;"
-            cur.execute(select_request, (args.rid,))
+            cur.execute(
+                "SELECT * "
+                "FROM requests "
+                "WHERE rid = ?",
+                (args.rid,)
+            )
             selected = cur.fetchone()
 
             print("You have selected: {}".format(selected))
@@ -329,20 +352,23 @@ class MiniProjectShell(cmd.Cmd):
                     input("Would you like to message the poster? [y|n]\n")
                 if response == "y":
                     message = input("Your message: ")
-                    get_poster = "SELECT email from requests " \
-                                 "WHERE rid=?;"
-                    cur.execute(get_poster, (args.rid,))
+                    cur.execute(
+                        "SELECT email "
+                        "FROM requests "
+                        "WHERE rid = ?",
+                        (args.rid,)
+                    )
                     poster = cur.fetchone()[0]
 
-                    send_to_inbox = "INSERT INTO inbox values " \
-                                    "(?, ?, ?, ?, ?, ?);"
-                    cur.execute(send_to_inbox,
-                                (poster,
-                                 pendulum.now().to_datetime_string(),
-                                 self.login_session.get_email(),
-                                 message,
-                                 0,  # TODO: What to put here?
-                                 "n"))
+                    cur.execute(
+                        "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);",
+                        (poster,
+                         pendulum.now().to_datetime_string(),
+                         self.login_session.get_email(),
+                         message,
+                         0,  # TODO: What to put here?
+                         "n")
+                    )
                     self.database.commit()
                     break
                 elif response == "n":
@@ -379,10 +405,15 @@ class MiniProjectShell(cmd.Cmd):
         to the newly created :class:`LoginSession`.
         """
         if self.login_session:
-            __log__.error("already logged in as user: {}".format(self.login_session.get_email()))
+            __log__.error("already logged in as user: {}".format(
+                self.login_session.get_email()))
         else:
-            user_hit = self.database.execute("select email, pwd from members where email = ? and pwd = ?",
-                                             (email.lower(), password)).fetchone()
+            user_hit = self.database.execute(
+                "SELECT email, pwd "
+                "FROM members "
+                "WHERE email = ? AND pwd = ?",
+                (email.lower(), password)
+            ).fetchone()
             if user_hit:
                 self.login_session = LoginSession(user_hit[0], user_hit[1])
                 __log__.info("logged in user: {}".format(user_hit[0]))
@@ -391,19 +422,22 @@ class MiniProjectShell(cmd.Cmd):
 
     # TODO: this should be moved outside if possible
     def validate_location_code(self, location_code_str: str):
-        """Validate that a location ode for use in ``post_ride_request`` command
-        actually exists in locations
+        """Validate that a location ode for use in ``post_ride_request``
+        command actually exists in locations
 
         :raises: :class:`ShellArgumentException` if the given location code
                  is not within the ``locations`` table.
         """
 
-        locations = self.database.execute("SELECT lcode "
-                                          "FROM locations "
-                                          "WHERE locations.lcode = ?", (location_code_str,)).fetchone()
+        locations = self.database.execute(
+            "SELECT lcode "
+            "FROM locations "
+            "WHERE locations.lcode = ?",
+            (location_code_str,)
+        ).fetchone()
         if not locations:
-            raise ShellArgumentException("invalid location code: {}".format(location_code_str))
-
+            raise ShellArgumentException(
+                "invalid location code: {}".format(location_code_str))
 
 
 def print_5_and_prompt(rows):
@@ -411,8 +445,8 @@ def print_5_and_prompt(rows):
         print("First 5 rows:")
         for row in rows[:5]:
             print(row)
-        see_more = input(
-            "Enter 'all' to see all results or enter anything else to finish.\n").lower()
+        see_more = input("Enter 'all' to see all results or enter anything "
+                         "else to finish.\n").lower()
         if see_more == "all":
             print("All rows:")
             for row in rows:
@@ -421,11 +455,13 @@ def print_5_and_prompt(rows):
         for row in rows:
             print(row)
 
+
 # TODO: what is this needed for
 def get_select_ride_request_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
-        description="Select a ride request and perform actions with it")
+        description="Select a ride request and perform actions with it"
+    )
     
     parser.add_argument("rid", type=int,
                         help="The ID of the ride request to delete")
