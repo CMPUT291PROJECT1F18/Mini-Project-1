@@ -87,6 +87,7 @@ def test_valid_password_valid():
 
 
 def test_valid_password_invalid():
+    assert not valid_password("")
     assert not valid_password("1234567")
     assert not valid_password("abcdefg")
 
@@ -107,6 +108,7 @@ def test_valid_phone_valid():
 
 
 def test_valid_phone_invalid():
+    assert not valid_phone("")
     assert not valid_phone("000-000-00000")
     assert not valid_phone("000-0000-0000")
     assert not valid_phone("0000-000-0000")
