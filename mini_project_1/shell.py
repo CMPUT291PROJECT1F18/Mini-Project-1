@@ -13,8 +13,8 @@ import pendulum
 from mini_project_1.book_member import get_book_member_parser, book_member
 from mini_project_1.cancel_booking import get_cancel_booking_parser
 from mini_project_1.common import ShellArgumentException, \
-    MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, get_selection, send_message, check_valid_email, \
-    check_valid_lcode
+    MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, \
+    get_selection, send_message, check_valid_email, check_valid_lcode
 from mini_project_1.delete_request import get_delete_request_parser
 from mini_project_1.list_bookings import get_list_bookings_parser
 from mini_project_1.list_requests import get_list_ride_requests_parser
@@ -22,7 +22,8 @@ from mini_project_1.loginsession import LoginSession
 from mini_project_1.logout import get_logout_parser
 from mini_project_1.register import valid_password, \
     register_member, valid_name, valid_phone, valid_email
-from mini_project_1.offer_ride import get_offer_ride_parser, check_valid_cno, offer_ride
+from mini_project_1.offer_ride import get_offer_ride_parser, \
+    check_valid_cno, offer_ride
 from mini_project_1.post_request import get_post_request_parser
 from mini_project_1.search_requests import \
     get_search_requests_city_parser, \
