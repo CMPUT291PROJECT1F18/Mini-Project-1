@@ -29,7 +29,8 @@ def log_level(log_level_string: str):
     return getattr(logging, log_level_string, logging.INFO)
 
 
-DATABASE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
+DATABASE_DIR = \
+    os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
 DATABASE_TABLE_CREATE = os.path.join(DATABASE_DIR, "create_tables.sql")
 DATABASE_DATA_CREATE = os.path.join(DATABASE_DIR, "create_data.sql")
 

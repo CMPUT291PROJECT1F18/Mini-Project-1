@@ -1,16 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+"""Offer a ride
+
+The member should be able to offer rides by providing a date, the number of
+seats offered, the price per seat, a luggage description, a source location,
+and a destination location. The member should have the option of adding a
+car number and any set of enroute locations.
 """
-Offer a ride.
-The member should be able to offer rides by providing a date, the number of seats offered,
-the price per seat, a luggage description, a source location, and a destination location.
-The member should have the option of adding a car number and any set of enroute locations.
-"""
+
 import sqlite3
 
 import pendulum
 
-from mini_project_1.common import ShellArgumentParser, date, greater_than_zero_number, price
+from mini_project_1.common import ShellArgumentParser, date, \
+    greater_than_zero_number, price
 from mini_project_1.loginsession import LoginSession
 
 
@@ -47,20 +51,32 @@ def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulu
     :return: if a ride has been added (True/False)
     """
     dbcursor = database.cursor()
-    dbcursor.execute("SELECT MAX(rno) FROM rides")
+    dbcursor.execute(
+        "SELECT MAX(rno) "
+        "FROM rides"
+    )
     rno = str(int(dbcursor.fetchone()[0]) + 1)
 
     try:
         dbcursor.execute(
             "INSERT INTO rides (rno, price, rdate, seats, lugDesc, src, dst, driver) VALUES " +
             "(?, ?, ?, ?, ?, ?, ?, ?)",
-            (rno, price, date, seats, luggage, source, destination, member.get_email()))
+            (rno, price, date, seats, luggage, source, destination, member.get_email())
+        )
 
         if cno:
-            dbcursor.execute("UPDATE rides SET cno = ? WHERE rno = ?", (cno, rno))
+            dbcursor.execute(
+                "UPDATE rides "
+                "SET cno = ? "
+                "WHERE rno = ?",
+                (cno, rno)
+            )
 
         for place in enroute:
-            dbcursor.execute("INSERT INTO enroute (rno, lcode) VALUES (?, ?)", (rno, place))
+            dbcursor.execute(
+                "INSERT INTO enroute (rno, lcode) VALUES (?, ?)",
+                (rno, place)
+            )
     except sqlite3.OperationalError as e:
         print(e)
         return False
@@ -75,7 +91,12 @@ def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulu
 def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: LoginSession):
     """Returns whether a member has a car number cno in the database with
     cursor dbcursor"""
-    dbcursor.execute("SELECT cno FROM cars WHERE cno = ? AND owner = ?", (cno, member.get_email()))
+    dbcursor.execute(
+        "SELECT cno "
+        "FROM cars "
+        "WHERE cno = ? AND owner = ?",
+        (cno, member.get_email())
+    )
     if dbcursor.fetchall():
         return True
     return False
