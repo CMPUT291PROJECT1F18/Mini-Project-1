@@ -94,7 +94,6 @@ def test_help_messsages(mock_db):
     shell.help_logout()
 
 
-
 ###############################
 # tests related to register.py
 ###############################
