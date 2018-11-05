@@ -72,14 +72,14 @@ def test_logout(mock_db):
 ###############################
 
 
-def test_check_valid_email_valid(mock_db):
+def test_valid_email_valid(mock_db):
     """Test valid_email with valid emails"""
     database = sqlite3.connect(mock_db)
     # check for a valid new unique email
     assert valid_email(database, "cra@example.com")
 
 
-def test_check_valid_email_invalid(mock_db):
+def test_valid_email_invalid(mock_db):
     """Test valid_email with invalid emails"""
     database = sqlite3.connect(mock_db)
     # check for a invalid new unique email
