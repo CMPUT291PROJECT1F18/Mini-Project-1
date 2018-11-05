@@ -20,7 +20,8 @@ __log__ = getLogger(__name__)
 
 def check_valid_email(database: sqlite3.Connection, email: str) -> bool:
     """Check if a given email is unique to the mini-project-1 database"""
-    email_hits = database.execute("SELECT email from members where email = ?", (email, )).fetchone()
+    email_hits = database.execute("SELECT email from members where email = ?",
+                                  (email, )).fetchone()
     if email_hits:
         return False
     else:
@@ -68,14 +69,19 @@ def name(name_str: str) -> str:
         return name_str
 
 
-def register_member(database: sqlite3.Connection, email: str, name: str, phone: str, password: str):
+def register_member(database: sqlite3.Connection, email: str, name: str,
+                    phone: str, password: str):
     """Register a new member into the mini-project-1 database"""
     if check_valid_email(database, email):
-        database.execute("INSERT INTO members VALUES (?, ?, ?, ?)", (email, name, phone, password))
+        database.execute("INSERT INTO members VALUES (?, ?, ?, ?)",
+                         (email, name, phone, password))
         database.commit()
-        __log__.info("registered user: email: {} name: {} phone: {}".format(email, name, phone))
+        __log__.info("registered user: email: {} name: {} phone: {}".format(
+            email, name, phone))
     else:
-        raise Exception("email {} already taken: please choose an alternative".format(email))
+        raise Exception(
+            "email {} already taken: please choose an alternative".format(
+                email))
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -83,10 +89,8 @@ def get_parser() -> argparse.ArgumentParser:
     mini-project-1 database"""
     parser = get_main_parser()
     parser.description = \
-        "register a new member to an existing mini-project-1 database"
+        "Register a new member to an existing mini-project-1 database"
     group = parser.add_argument_group(title='registration')
-    group.add_argument("-r", "--register", action="store_true",
-                       help="Enable registering a new user")
     group.add_argument("email", type=email,
                        help="A unique email to register and login with")
     group.add_argument("phone", type=phone,
@@ -98,7 +102,7 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv=sys.argv[1:]):
+def main(argv=sys.argv[1:]) -> int:
     """entry point for registering members to an existing mini-project-1
     database"""
     parser = get_parser()

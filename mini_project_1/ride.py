@@ -1,9 +1,13 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import sqlite3
 from datetime import datetime
 
 import pendulum
 
 from mini_project_1.loginsession import LoginSession
+
 
 """
 Offer a ride.
@@ -19,8 +23,9 @@ class ValueNotFoundException(Exception):
 
 
 def get_selection(items: list):
-    """
-    Gets the user to select a item from a list, displaying up to 5 items at a time.
+    """Gets the user to select a item from a list, displaying up to 5 items
+    at a time.
+
     :param items: list of items
     :return: selected item from items
     """
@@ -82,7 +87,8 @@ def get_location_id(dbcursor: sqlite3.Cursor, keyword: str, prompt:str = None):
 
 
 def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: LoginSession):
-    """ Returns whether a member has a car number cno in the database with cursor dbcursor"""
+    """Returns whether a member has a car number cno in the database with
+    cursor dbcursor"""
     dbcursor.execute("SELECT cno FROM cars WHERE cno = ? AND owner = ?", (cno, member.get_email()))
     if len(dbcursor.fetchall()):
         return True
@@ -123,17 +129,18 @@ def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulu
     return True
 
 
-"""
-Search for rides.
-The member should be able to enter 1-3 location keywords and retrieve all rides that match all keywords. 
-A ride matches a keyword if the keyword matches one of the locations source, destination, or enroute. 
-Also a location matches a keyword if the keyword is either the location code or a substring of the city, 
-the province, or the address fields of the location. For each matching ride, all information about the ride 
-(from the rides table) and car details (if any) will be displayed. If there are more than 5 matches, 
-at most 5 will be shown at a time, and the member is provided an option to see more. 
-The member should be able to select a ride and message the member posting the ride that h/she 
-wants to book seats on that ride.
-"""
+"""Search for rides.
+
+The member should be able to enter 1-3 location keywords and retrieve all 
+rides that match all keywords. A ride matches a keyword if the keyword 
+matches one of the locations source, destination, or enroute. Also a 
+location matches a keyword if the keyword is either the location code or a 
+substring of the city, the province, or the address fields of the location. 
+For each matching ride, all information about the ride (from the rides 
+table) and car details (if any) will be displayed. If there are more than 5 
+matches, at most 5 will be shown at a time, and the member is provided an 
+option to see more. The member should be able to select a ride and message 
+the member posting the ride that h/she wants to book seats on that ride. """
 
 
 def search_for_ride():
@@ -141,23 +148,28 @@ def search_for_ride():
     pass
 
 
-"""
-Book members or cancel bookings.
-The member should be able to list all bookings on rides s/he offers and cancel any booking. 
-For any booking that is cancelled (i.e. being deleted from the booking table), 
-a proper message should be sent to the member whose booking is cancelled. 
-Also the member should be able to book other members on the rides they offer. 
-Your system should list all rides the member offers with the number of available seats for each ride 
-(i.e., seats that are not booked). If there are more than 5 matching rides, at most 5 will be shown at a time, 
-and the member will have the option to see more. The member should be able to select a ride and book a member for 
-that ride by entering the member email, the number of seats booked, the cost per seat, 
-and pickup and drop off location codes. Your system should assign a unique booking number (bno) to the booking. 
-Your system should give a warning if a ride is being overbooked (i.e. the number of seats booked exceeds the number 
-of seats offered), but will allow overbooking if the member confirms it. After a successful booking, 
-a proper message should be sent to the other member that s/he is booked on the ride.
-Post ride requests.The member should be able to post a ride request by providing a date, a pick up location code, 
-a drop off location code, and the amount willing to pay per seat. The request rid is set by your system to a unique 
-number and the email is set to the email address of the member.
+"""Book members or cancel bookings.
+
+The member should be able to list all bookings on rides s/he offers and 
+cancel any booking. For any booking that is cancelled (i.e. being deleted 
+from the booking table), a proper message should be sent to the member whose 
+booking is cancelled. Also the member should be able to book other members 
+on the rides they offer. Your system should list all rides the member offers 
+with the number of available seats for each ride (i.e., seats that are not 
+booked). If there are more than 5 matching rides, at most 5 will be shown at 
+a time, and the member will have the option to see more. The member should 
+be able to select a ride and book a member for that ride by entering the 
+member email, the number of seats booked, the cost per seat, and pickup and 
+drop off location codes. Your system should assign a unique booking number (
+bno) to the booking. Your system should give a warning if a ride is being 
+overbooked (i.e. the number of seats booked exceeds the number of seats 
+offered), but will allow overbooking if the member confirms it. After a 
+successful booking, a proper message should be sent to the other member that 
+s/he is booked on the ride. Post ride requests.The member should be able to 
+post a ride request by providing a date, a pick up location code, a drop off 
+location code, and the amount willing to pay per seat. The request rid is 
+set by your system to a unique number and the email is set to the email 
+address of the member.
 """
 
 
@@ -166,14 +178,15 @@ def book_member():
     pass
 
 
-"""
-Search and delete ride requests. 
-The member should be able to see all his/her ride requests and be able to delete any of them. 
-Also the member should be able to provide a location code or a city and see a listing of all requests with a 
-pickup location matching the location code or the city entered. If there are more than 5 matches, at most 5 matches
- will be shown at a time. The member should be able to select a request and message the posting member, for example 
- asking the member to check out a ride.
-"""
+"""Search and delete ride requests. 
+
+The member should be able to see all his/her ride requests and be able to 
+delete any of them. Also the member should be able to provide a location 
+code or a city and see a listing of all requests with a pickup location 
+matching the location code or the city entered. If there are more than 5 
+matches, at most 5 matches will be shown at a time. The member should be 
+able to select a request and message the posting member, for example asking 
+the member to check out a ride. """
 
 if __name__ == "__main__":
     conn = sqlite3.connect("test2.db")

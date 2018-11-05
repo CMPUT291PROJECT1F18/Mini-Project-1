@@ -12,8 +12,8 @@ class LoginSession:
     """Class representing a logged in session to the mini-project-1 database"""
 
     def __init__(self, email: str, password: str):
-        self.email = email
-        self.password = password
+        self._email = email
+        self._password = password
 
     def get_email(self) -> str:
-        return self.email
+        return self._email

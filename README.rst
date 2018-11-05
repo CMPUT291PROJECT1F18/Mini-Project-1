@@ -20,6 +20,10 @@ Requirements
 Overview
 ========
 
+mini-project-1 is a simple command line interface (CLI) tool for interacting
+with a database service that provide information similar to popular ride
+sharing applications.
+
 
 Installation
 ============
@@ -41,11 +45,23 @@ command:
 
 .. code-block:: bash
 
-    mini-project-1
+    mini-project-1 -i example.db -v
 
-To get additional usage help on mini-project-1 run the following console
-command:
+
+This will create an initial mini-project-1 database named ``example.db`` at
+your current directory and will immediately give you a prompt to login to
+such database.
+
+To get additional usage help on starting mini-project-1 run the following
+console command:
 
 .. code-block:: bash
 
     mini-project-1 --help
+
+To get help on registering a new member to a mini-project-1 database
+run the following console command:
+
+.. code-block:: base
+
+    mini-project-register --help
