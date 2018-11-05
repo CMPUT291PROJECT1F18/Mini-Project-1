@@ -75,7 +75,7 @@ class MiniProjectShell(cmd.Cmd):
     # ===============================
 
     def do_login(self, arg):
-        """Login to the mini-project-1 database: login"""
+        """Login to the mini-project-1 database"""
         if self.login_session:
             __log__.error("already logged in")
         else:
@@ -89,7 +89,7 @@ class MiniProjectShell(cmd.Cmd):
 
     @logged_in
     def do_logout(self, arg):
-        """Logout to the mini-project-1 database: logout"""
+        """Logout from the mini-project-1 database"""
         parser = get_logout_parser()
         try:
             parser.parse_args(arg.split())
@@ -98,7 +98,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.exception("invalid logout arguement")
 
     def help_logout(self):
-        """Parser help message for logout"""
+        """Print the argparser help message for logout"""
         get_logout_parser().print_help()
 
     def do_exit(self, arg):
@@ -145,7 +145,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.exception("invalid show_inbox argument")
 
     def help_show_inbox(self):
-        """Parser help message for show_inbox"""
+        """Print the argparser help message for show_inbox"""
         get_show_inbox_parser().print_help()
 
     @logged_in
@@ -181,7 +181,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.error("invalid offer_ride argument")
 
     def help_offer_ride(self):
-        """Parser help message for offering a ride"""
+        """Print the argparser help message for offer_ride"""
         get_offer_ride_parser().print_help()
 
     @logged_in
@@ -239,7 +239,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.error("invalid search_rides argument")
 
     def help_search_rides(self):
-        """Parser help message for searching rides"""
+        """Print the argparser help message for search_rides"""
         get_search_for_ride_parser().print_help()
 
     @logged_in
@@ -263,7 +263,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.exception("invalid list_bookings argument")
 
     def help_list_bookings(self):
-        """List all the bookings that the user offers"""
+        """Print the argparser help message for list_bookings"""
         get_list_bookings_parser().print_help()
 
     @logged_in
@@ -322,7 +322,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.error("invalid book_member argument")
 
     def help_book_member(self):
-        """Parser help message for booking a member"""
+        """Print the argparser help message for book_member"""
         get_search_for_ride_parser().print_help()
 
     @logged_in
@@ -375,7 +375,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.exception("invalid cancel_booking argument")
 
     def help_cancel_booking(self):
-        """Parser help message for cancelling a booking"""
+        """Print the argparser help message for cancel_booking"""
         get_cancel_booking_parser().print_help()
 
     @logged_in
@@ -408,7 +408,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.exception("invalid post_ride_request argument")
         else:
             __log__.info(
-                "succesfully posted ride request: "
+                "successfully posted ride request: "
                 "rid: {} email: {} date: {} pickup: {} dropoff: {} price: {}".format(
                     rid, self.login_session.get_email(),
                     args.date.strftime(MINI_PROJECT_DATE_FMT),
@@ -417,7 +417,7 @@ class MiniProjectShell(cmd.Cmd):
             )
 
     def help_post_request(self):
-        """Post a ride request's parsers help message"""
+        """Print the argparser help message for post_request"""
         get_post_request_parser().print_help()
 
     @logged_in
@@ -440,7 +440,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.exception("invalid list_requests arguement")
 
     def help_list_requests(self):
-        """Print the list_requests argparser help message"""
+        """Print the argparser help message for list_requests"""
         get_list_ride_requests_parser().print_help()
 
     @logged_in
@@ -463,7 +463,8 @@ class MiniProjectShell(cmd.Cmd):
             __log__.exception("invalid argument")
 
     def help_search_requests_lcode(self):
-        """Parser help message for searching ride requests by location code"""
+        """Print the argparser help message for searching ride requests by
+        location code"""
         get_search_requests_lcode_parser().print_help()
 
     @logged_in
@@ -487,7 +488,8 @@ class MiniProjectShell(cmd.Cmd):
             __log__.exception("invalid argument")
 
     def help_search_requests_city(self):
-        """Parser help message for searching ride requests by city name"""
+        """Print the argparser help message for searching ride requests
+        by city name"""
         get_search_requests_city_parser().print_help()
 
     @logged_in
@@ -526,7 +528,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.exception("invalid argument")
 
     def help_delete_request(self):
-        """Parser help message for deleting a ride request"""
+        """Print the argparser help message for deleting a ride request"""
         get_delete_request_parser().print_help()
 
     @logged_in
@@ -576,7 +578,7 @@ class MiniProjectShell(cmd.Cmd):
             __log__.error("invalid argument")
 
     def help_select_request(self):
-        """Parser help message for selecting a ride request"""
+        """Print the argparser help message for selecting a ride request"""
         get_select_request_parser().print_help()
 
     def do_register(self, arg):
