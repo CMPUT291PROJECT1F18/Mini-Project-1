@@ -16,8 +16,11 @@ Modules:
  + :mod:`.ride` - advanced ride offering logic
  + :mod:`.delete_ride_request`
  + :mod:`.post_ride_request`
- + :mod:`.search_ride_request`
+ + :mod:`.search_ride_requests`
+ + :mod:`.search_rides`
  + :mod:`.select_ride_request`
+ + :mod:`.offer_ride`
+ + :mod:`.book_member`
  + :mod:`.cancel_booking`
  + :mod:`.common` - common functionality used in mini-project-1
 """
