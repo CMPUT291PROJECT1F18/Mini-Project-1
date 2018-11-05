@@ -497,6 +497,7 @@ class MiniProjectShell(cmd.Cmd):
         parser = get_delete_request_parser()
         parser.print_help()
 
+    @logged_in
     def do_select_request(self, arg):
         """Select a ride request and perform actions"""
         cur = self.database.cursor()
