@@ -19,6 +19,8 @@ from mini_project_1.common import ShellArgumentParser
 
 
 def get_search_for_ride_parser() -> ShellArgumentParser:
+    """Argparser for the :class:`.shell.MiniProjectShell`
+    ``search_rides`` command"""
     parser = ShellArgumentParser(
         prog="search_rides",
         add_help=False,

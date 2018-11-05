@@ -15,6 +15,8 @@ from mini_project_1.common import ShellArgumentParser
 
 
 def get_search_requests_lcode_parser() -> ShellArgumentParser:
+    """Argparser for the :class:`.shell.MiniProjectShell`
+    ``search_requests_lcode`` command"""
     parser = ShellArgumentParser(
         prog="search_requests_lcode",
         add_help=False,
@@ -26,6 +28,8 @@ def get_search_requests_lcode_parser() -> ShellArgumentParser:
 
 
 def get_search_requests_city_parser() -> ShellArgumentParser:
+    """Argparser for the :class:`.shell.MiniProjectShell`
+    ``search_requests_city`` command"""
     parser = ShellArgumentParser(
         prog="search_requests_city",
         add_help=False,

@@ -13,11 +13,14 @@ MINI_PROJECT_DATE_FMT = "%Y-%m-%d"
 
 
 class ShellArgumentException(Exception):
+    """Custom exception class noting a invalid argument within a
+    :class:`.shell.MiniProjectShell` command"""
     def __init__(self, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
 
 
 class ShellArgumentParser(argparse.ArgumentParser):
+    """Custom argument parser for use in :class`.shell.MiniProjectShell`"""
     def error(self, message):
         self.print_help(sys.stderr)
         raise ShellArgumentException(message)

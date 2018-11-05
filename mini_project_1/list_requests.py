@@ -10,6 +10,8 @@ from mini_project_1.common import ShellArgumentParser
 
 
 def get_list_ride_requests_parser() -> ShellArgumentParser:
+    """Argparser for the :class:`.shell.MiniProjectShell`
+    ``list_requests`` command"""
     parser = ShellArgumentParser(
         prog="list_requests",
         add_help=False,

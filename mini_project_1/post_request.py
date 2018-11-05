@@ -16,8 +16,7 @@ from logging import getLogger
 
 import pendulum
 
-from mini_project_1.common import ShellArgumentParser, MINI_PROJECT_DATE_FMT, \
-    ShellArgumentException
+from mini_project_1.common import ShellArgumentParser, MINI_PROJECT_DATE_FMT
 
 
 __log__ = getLogger(__name__)
@@ -51,8 +50,8 @@ def date(date_str: str) -> pendulum.DateTime:
 
 
 def get_post_request_parser() -> ShellArgumentParser:
-    """Get a :class:`ShellArgumentParser` for use in parsing the arguments
-    for a ``post_ride_request`` command"""
+    """Argparser for the :class:`.shell.MiniProjectShell`
+    ``post_request`` command"""
     parser = ShellArgumentParser(
         prog="post_request",
         add_help=False,
