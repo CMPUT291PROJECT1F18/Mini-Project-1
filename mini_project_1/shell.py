@@ -199,6 +199,10 @@ class MiniProjectShell(cmd.Cmd):
             self.database.commit()
         except ShellArgumentException:
             __log__.exception("invalid post_ride_request argument")
+        else:
+            __log__.info("succesfully posted ride request: rid: {} email: {} date: {} pickup: {} dropoff: {} price: {}".format(
+                rid, self.login_session.get_email(), args.date.strftime(MINI_PROJECT_DATE_FMT), args.pickup, args.dropoff, args.price)
+            )
 
     def help_post_ride_request(self):
         """Post a ride request's parsers help message"""
