@@ -9,7 +9,6 @@ from getpass import getpass
 from logging import getLogger
 
 import pendulum
-from mini_project_1.ride import get_selection, get_location_id, offer_ride, ValueNotFoundException, check_valid_cno
 
 from mini_project_1.cancel_booking import get_cancel_booking_parser
 from mini_project_1.common import ShellArgumentException, \
@@ -571,63 +570,3 @@ def print_5_and_prompt(rows):
     else:
         for row in rows:
             print(row)
-
-
-def price(price_string: str) -> int:
-    price = int(price_string)
-    if price < 0:
-        raise argparse.ArgumentTypeError(
-            "invalid price: {} (please choose a non negative price)".format(
-                price_string
-            )
-        )
-    return price
-
-
-def greater_than_zero_number(value: str) -> int:
-    value = int(value)
-    if value <= 0:
-        raise argparse.ArgumentTypeError("%s must be a greater than zero number" % value)
-    return value
-
-
-def date(date_str: str) -> pendulum.DateTime:
-    return pendulum.parse(date_str)
-
-
-def get_offer_ride_parser() -> ShellArgumentParser:
-    parser = ShellArgumentParser(
-        add_help=False,
-        description="Offer a ride")
-
-    # date, seats, price, luggage, source, destination, cno, enroute
-    parser.add_argument("date", type=date,
-                        help="Date the ride should start on")
-    parser.add_argument("seats", type=greater_than_zero_number,
-                        help="The number of seats offered")
-    parser.add_argument("price", type=price,
-                        help="The amount you want per seat for the ride")
-    parser.add_argument("luggage",
-                        help="Description of car luggage")
-    parser.add_argument("src",
-                        help="Keyword for the start location of the ride")
-    parser.add_argument("dst",
-                        help="Keyword for the end location of the ride")
-    parser.add_argument("--cno", nargs='?', default=None,
-                        help="Your car number to use")
-    parser.add_argument("--enroute", nargs='+', default=set(),
-                        help="Enroute locations to go to")
-    return parser
-
-
-def get_search_for_ride_parser() -> ShellArgumentParser:
-    parser = ShellArgumentParser(
-        add_help=False,
-        description="Offer a ride")
-    parser.add_argument("term1",
-                        help="Location search term to use to look rides")
-    parser.add_argument("term2", nargs='?', default=None,
-                        help="Location search term to use to look rides")
-    parser.add_argument("term3", nargs='?', default=None,
-                        help="Location search term to use to look rides")
-    return parser
