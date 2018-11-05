@@ -21,7 +21,6 @@ __log__ = getLogger(__name__)
 def check_valid_email(database: sqlite3.Connection, email: str) -> bool:
     """Check if a given email is unique to the mini-project-1 database"""
     email_hits = database.execute("SELECT email from members where email = ?", (email, )).fetchone()
-    print(email_hits)
     if email_hits:
         return False
     else:
