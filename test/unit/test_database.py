@@ -180,6 +180,10 @@ def test_help_messsages(mock_db):
     shell.help_select_request()
     shell.help_post_request()
     shell.help_offer_ride()
+    shell.help_list_bookings()
+    shell.help_list_requests()
+    shell.help_logout()
+
 
 
 ###############################

@@ -15,6 +15,7 @@ def get_cancel_booking_parser() -> ShellArgumentParser:
     """Get a :class:`ShellArgumentParser` for use in parsing the arguments
     for a ``cancel_booking`` command"""
     parser = ShellArgumentParser(
+        prog="cancel_booking",
         add_help=False,
         description="Cancel a booking")
 
