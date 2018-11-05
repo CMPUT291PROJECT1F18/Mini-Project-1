@@ -13,15 +13,19 @@ Modules:
  + :mod:`.book_member` -
  + :mod:`.cancel_booking` -
  + :mod:`.common` - common functionality used in mini-project-1
- + :mod:`.delete_ride_request` -
+ + :mod:`.delete_request` -
+ + :mod:`.list_bookings` -
+ + :mod:`.list_requests` -
  + :mod:`.loginsession` - login session object definition
+ + :mod:`.logout` -
  + :mod:`.offer_ride` -
- + :mod:`.post_ride_request` -
+ + :mod:`.post_request` -
  + :mod:`.register` - mini-project-1 member registration
  + :mod:`.search_ride_requests` -
  + :mod:`.search_rides` -
  + :mod:`.select_ride_request` -
  + :mod:`.shell` - command shell
+ + :mod:`.show_inbox` -
 """
 
 __version__ = (0, 0, 0)
