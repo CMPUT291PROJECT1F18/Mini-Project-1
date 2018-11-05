@@ -319,9 +319,11 @@ class MiniProjectShell(cmd.Cmd):
                 'WHERE bookings.rno = ?;',
                 (rno,)
             )
-            seats_taken = cur.fetchone()[0]
+            seats_taken = cur.fetchone()
             if not seats_taken:
                 seats_taken = 0
+            else:
+                seats_taken = seats_taken[0]
 
             # book seats if available or user accepts overbooking
             if seats_available < seats_taken + args.seats:
