@@ -128,10 +128,12 @@ class MiniProjectShell(cmd.Cmd):
                 "l2.lcode = ? OR l2.city LIKE ? OR l2.prov LIKE ? OR l2.address LIKE ? OR " + \
                 "l3.lcode = ? OR l3.city LIKE ? OR l3.prov LIKE ? OR l3.address LIKE ?)"
 
+            # setup query conditions for one term
             search_string = search_conditions
             search_vars = (args.term1, '%'+args.term1+'%', '%'+args.term1+'%', '%'+args.term1+'%',
                            args.term1, '%'+args.term1+'%', '%'+args.term1+'%', '%'+args.term1+'%',
                            args.term1, '%'+args.term1+'%', '%'+args.term1+'%', '%'+args.term1+'%')
+            # add query conditions for the second term if supplied
             if args.term2:
                 search_string = search_string + " AND " + search_conditions
                 more_search_vars = (args.term2, '%'+args.term2+'%', '%'+args.term2+'%', '%'+args.term2+'%',
@@ -139,6 +141,7 @@ class MiniProjectShell(cmd.Cmd):
                                     args.term2, '%'+args.term2+'%', '%'+args.term2+'%', '%'+args.term2+'%')
                 search_vars = search_vars + more_search_vars
 
+            # add query conditions for the third term if supplied
             if args.term3:
                 search_string = search_string + " AND " + search_conditions
                 more_search_vars = (args.term3, '%'+args.term3+'%', '%'+args.term3+'%', '%'+args.term3+'%',
