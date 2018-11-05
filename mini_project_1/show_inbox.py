@@ -12,9 +12,10 @@ from mini_project_1.common import ShellArgumentParser
 
 
 def get_show_inbox_parser() -> ShellArgumentParser:
+    """Argparser for the :class:`.shell.MiniProjectShell`
+    ``show_inbox`` command"""
     parser = ShellArgumentParser(
         prog="show_inbox",
-        add_help=False,
         description="List all the unseen messages in your inbox")
 
     return parser

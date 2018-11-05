@@ -26,9 +26,10 @@ from mini_project_1.common import ShellArgumentParser, \
 
 
 def get_book_member_parser() -> ShellArgumentParser:
+    """Argparser for the :class:`.shell.MiniProjectShell`
+    ``book_member`` command"""
     parser = ShellArgumentParser(
         prog="book_member",
-        add_help=False,
         description="Book a member on a ride")
 
     parser.add_argument("email",
@@ -46,13 +47,16 @@ def get_book_member_parser() -> ShellArgumentParser:
 
 
 def book_member(database: sqlite3.Connection, rno: int, email: str, seats: int,
-                seat_price: int, src: str, dst: str):
+                seat_price: int, src: str, dst: str) -> bool:
     """Books a member on a ride and generates its booking number"""
     dbcursor = database.cursor()
     dbcursor.execute("Select MAX(bno) from bookings")
     bno = int(dbcursor.fetchone()[0]) + 1
     try:
-        dbcursor.execute("INSERT into Bookings values(?,?,?,?,?,?,?)", (bno, email, rno, seat_price, seats, src, dst))
+        dbcursor.execute(
+            "INSERT into Bookings values(?,?,?,?,?,?,?)",
+            (bno, email, rno, seat_price, seats, src, dst)
+        )
         database.commit()
         print("Booking added")
     except sqlite3.InterfaceError:

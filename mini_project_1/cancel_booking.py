@@ -16,7 +16,6 @@ def get_cancel_booking_parser() -> ShellArgumentParser:
     for a ``cancel_booking`` command"""
     parser = ShellArgumentParser(
         prog="cancel_booking",
-        add_help=False,
         description="Cancel a booking")
 
     parser.add_argument("bno", type=int,

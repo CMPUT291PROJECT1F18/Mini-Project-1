@@ -13,6 +13,7 @@ from mini_project_1.book_member import book_member
 from mini_project_1.common import send_message
 from mini_project_1.loginsession import LoginSession
 from mini_project_1.offer_ride import offer_ride
+from mini_project_1.post_request import valid_location_code
 from mini_project_1.shell import MiniProjectShell
 from mini_project_1.register import valid_email, valid_password, valid_name, \
     valid_phone, register_member
@@ -241,7 +242,6 @@ def test_help_messsages(mock_db):
     shell.help_logout()
 
 
-
 ###############################
 # tests related to register.py
 ###############################
@@ -303,3 +303,13 @@ def test_valid_phone_invalid():
     assert not valid_phone("0000-000-0000")
     assert not valid_phone("00000000000")
     assert not valid_phone("foobar")
+
+
+def test_valid_location_code_valid(mock_db):
+    database = sqlite3.connect(mock_db)
+    assert valid_location_code(database, "cntr1")
+
+
+def test_valid_location_code_invalid(mock_db):
+    database = sqlite3.connect(mock_db)
+    assert not valid_location_code(database, "INVALID_LOCATION_CODE")
