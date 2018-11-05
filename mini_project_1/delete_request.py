@@ -14,7 +14,6 @@ def get_delete_request_parser() -> ShellArgumentParser:
     ``delete_request`` command"""
     parser = ShellArgumentParser(
         prog="delete_request",
-        add_help=False,
         description="Delete a ride request by rid")
 
     parser.add_argument("rid", type=int,

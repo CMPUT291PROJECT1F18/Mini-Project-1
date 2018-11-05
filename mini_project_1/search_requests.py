@@ -19,7 +19,6 @@ def get_search_requests_lcode_parser() -> ShellArgumentParser:
     ``search_requests_lcode`` command"""
     parser = ShellArgumentParser(
         prog="search_requests_lcode",
-        add_help=False,
         description="Search ride requests by location code")
 
     parser.add_argument("lcode", help="The location code to search by")
@@ -32,7 +31,6 @@ def get_search_requests_city_parser() -> ShellArgumentParser:
     ``search_requests_city`` command"""
     parser = ShellArgumentParser(
         prog="search_requests_city",
-        add_help=False,
         description="Search ride requests by city name")
 
     parser.add_argument("city", help="The name of the city to search by")

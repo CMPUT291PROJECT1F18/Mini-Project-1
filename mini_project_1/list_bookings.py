@@ -14,7 +14,6 @@ def get_list_bookings_parser() -> ShellArgumentParser:
     ``list_bookings`` command"""
     parser = ShellArgumentParser(
         prog="list_bookings",
-        add_help=False,
         description="List all the bookings that you offer")
 
     return parser

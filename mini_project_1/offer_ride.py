@@ -23,7 +23,6 @@ def get_offer_ride_parser() -> ShellArgumentParser:
     ``offer_ride`` command"""
     parser = ShellArgumentParser(
         prog="offer_ride",
-        add_help=False,
         description="Offer a ride")
 
     # date, seats, price, luggage, source, destination, cno, enroute

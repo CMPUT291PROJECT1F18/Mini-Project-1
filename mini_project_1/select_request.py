@@ -11,7 +11,6 @@ def get_select_request_parser() -> ShellArgumentParser:
     ``select_request`` command"""
     parser = ShellArgumentParser(
         prog="select_request",
-        add_help=False,
         description="Select a ride request and perform actions with it"
     )
 

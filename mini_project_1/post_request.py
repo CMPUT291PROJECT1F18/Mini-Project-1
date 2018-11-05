@@ -54,7 +54,6 @@ def get_post_request_parser() -> ShellArgumentParser:
     ``post_request`` command"""
     parser = ShellArgumentParser(
         prog="post_request",
-        add_help=False,
         description="Post a ride request")
 
     parser.add_argument("date", type=date,

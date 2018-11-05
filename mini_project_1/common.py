@@ -21,6 +21,12 @@ class ShellArgumentException(Exception):
 
 class ShellArgumentParser(argparse.ArgumentParser):
     """Custom argument parser for use in :class`.shell.MiniProjectShell`"""
+
+    def __init__(self, *args, **kwargs):
+        # set ``add_help`` to false to avoid conflicts with the shell
+        kwargs["add_help"] = False
+        super().__init__(*args, **kwargs)
+
     def error(self, message):
         self.print_help(sys.stderr)
         raise ShellArgumentException(message)

@@ -30,7 +30,6 @@ def get_book_member_parser() -> ShellArgumentParser:
     ``book_member`` command"""
     parser = ShellArgumentParser(
         prog="book_member",
-        add_help=False,
         description="Book a member on a ride")
 
     parser.add_argument("email",
