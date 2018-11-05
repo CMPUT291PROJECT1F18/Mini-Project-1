@@ -83,7 +83,7 @@ def get_parser() -> argparse.ArgumentParser:
     mini-project-1 database"""
     parser = get_main_parser()
     parser.description = \
-        "register a new member to an existing mini-project-1 database"
+        "Register a new member to an existing mini-project-1 database"
     group = parser.add_argument_group(title='registration')
     group.add_argument("email", type=email,
                        help="A unique email to register and login with")
