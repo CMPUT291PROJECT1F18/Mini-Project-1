@@ -136,12 +136,13 @@ def send_message(database: sqlite3.Connection, recipient: str, sender: str, cont
     cur = database.cursor()
     cur.execute(
         "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);",
-        (recipient, pendulum.now().to_datetime_string(), sender, content, rno, "n")
+        (recipient, pendulum.now().to_datetime_string(),
+         sender, content, rno, "n")
     )
     database.commit()
 
 
-def check_valid_lcode(database: sqlite3.Connection, lcode: str):
+def check_valid_lcode(database: sqlite3.Connection, lcode: str) -> bool:
     """Checks whether a lcode is in the database"""
     dbcursor = database.cursor()
     dbcursor.execute(
@@ -155,7 +156,7 @@ def check_valid_lcode(database: sqlite3.Connection, lcode: str):
     return False
 
 
-def check_valid_email(database: sqlite3.Connection, email: str):
+def check_valid_email(database: sqlite3.Connection, email: str) -> bool:
     """Checks whether an email is in the database"""
     dbcursor = database.cursor()
     dbcursor.execute(
