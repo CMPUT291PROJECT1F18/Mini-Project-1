@@ -324,16 +324,12 @@ class MiniProjectShell(cmd.Cmd):
 
             self.database.commit()
             print("Successfully deleted:\n{}".format(to_delete))
-
-            send_message = "INSERT INTO inbox VALUES " \
-                           "(?, ?, ?, ?, ?, ?);"
-            cur.execute(send_message,
-                        (to_delete[1],
-                         pendulum.now().to_datetime_string(),
-                         self.login_session.get_email(),
-                         "Your booking has been cancelled.",
-                         to_delete[2],
-                         "n"))
+            cur.execute(
+                "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);",
+                (to_delete[1], pendulum.now().to_datetime_string(),
+                 self.login_session.get_email(), "Your booking has been cancelled.",
+                 to_delete[2], "n")
+            )
             self.database.commit()
             print("Successfully sent cancellation message to {}."
                   .format(to_delete[1]))
