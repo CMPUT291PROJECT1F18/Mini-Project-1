@@ -16,6 +16,8 @@ from mini_project_1.common import ShellArgumentException, \
     MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, get_selection, send_message, check_valid_email, \
     check_valid_lcode
 from mini_project_1.delete_request import get_delete_request_parser
+from mini_project_1.list_bookings import get_list_bookings_parser
+from mini_project_1.list_requests import get_list_ride_requests_parser
 from mini_project_1.loginsession import LoginSession
 from mini_project_1.register import valid_password, \
     register_member, valid_name, valid_phone, valid_email
@@ -160,8 +162,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def help_offer_ride(self):
         """Parser help message for offering a ride"""
-        parser = get_offer_ride_parser()
-        parser.print_help()
+        get_offer_ride_parser().print_help()
 
     @logged_in
     def do_search_rides(self, arg):
@@ -225,17 +226,26 @@ class MiniProjectShell(cmd.Cmd):
     @logged_in
     def do_list_bookings(self, arg):
         """List all the bookings that the user offers"""
-        cur = self.database.cursor()
-        cur.execute(
-            'SELECT DISTINCT bookings.* '
-            'FROM bookings, rides '
-            'WHERE rides.driver = ? '
-            'AND rides.rno = bookings.rno;',
-            (self.login_session.get_email(),)
-        )
-        rows = cur.fetchall()
-        for row in rows:
-            print(row)
+        parser = get_list_bookings_parser()
+        try:
+            parser.parse_args(arg.split())
+            cur = self.database.cursor()
+            cur.execute(
+                'SELECT DISTINCT bookings.* '
+                'FROM bookings, rides '
+                'WHERE rides.driver = ? '
+                'AND rides.rno = bookings.rno;',
+                (self.login_session.get_email(),)
+            )
+            rows = cur.fetchall()
+            for row in rows:
+                print(row)
+        except ShellArgumentException:
+            __log__.exception("invalid list_bookings argument")
+
+    def help_list_bookings(self):
+        """List all the bookings that the user offers"""
+        get_list_bookings_parser().print_help()
 
     @logged_in
     def do_book_member(self, arg):
@@ -348,8 +358,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def help_cancel_booking(self):
         """Parser help message for cancelling a booking"""
-        parser = get_cancel_booking_parser()
-        parser.print_help()
+        get_cancel_booking_parser().print_help()
 
     @logged_in
     def do_post_request(self, arg):
@@ -391,22 +400,30 @@ class MiniProjectShell(cmd.Cmd):
 
     def help_post_request(self):
         """Post a ride request's parsers help message"""
-        parser = get_post_request_parser()
-        parser.print_help()
+        get_post_request_parser().print_help()
 
     @logged_in
     def do_list_requests(self, arg):
         """List all the user's ride requests"""
-        cur = self.database.cursor()
-        cur.execute(
-            'SELECT DISTINCT * ' 
-            'FROM requests ' 
-            'WHERE email = ?',
-            (self.login_session.get_email().lower(),)
-        )
-        rows = cur.fetchall()
-        for row in rows:
-            print(row)
+        parser = get_list_ride_requests_parser()
+        try:
+            parser.parse_args(arg.split())
+            cur = self.database.cursor()
+            cur.execute(
+                'SELECT DISTINCT * ' 
+                'FROM requests ' 
+                'WHERE email = ?',
+                (self.login_session.get_email().lower(),)
+            )
+            rows = cur.fetchall()
+            for row in rows:
+                print(row)
+        except ShellArgumentException:
+            __log__.exception("invalid list_requests arguement")
+
+    def help_list_requests(self):
+        """Print the list_requests argparser help message"""
+        get_list_ride_requests_parser().print_help()
 
     @logged_in
     def do_search_requests_lcode(self, arg):
@@ -429,8 +446,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def help_search_requests_lcode(self):
         """Parser help message for searching ride requests by location code"""
-        parser = get_search_requests_lcode_parser()
-        parser.print_help()
+        get_search_requests_lcode_parser().print_help()
 
     @logged_in
     def do_search_requests_city(self, arg):
@@ -608,7 +624,7 @@ class MiniProjectShell(cmd.Cmd):
         attempt to login with the given email and password.
 
         If the login attempt is successful set the shell's ``login_session``
-        to the newly created :class:`LoginSession`.
+        to the newly created :class:`.loginsession.LoginSession`.
         """
         if self.login_session:
             __log__.error("already logged in as user: {}".format(
