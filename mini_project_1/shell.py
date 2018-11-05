@@ -17,6 +17,8 @@ from mini_project_1.common import ShellArgumentException, \
     check_valid_lcode
 from mini_project_1.delete_request import get_delete_request_parser
 from mini_project_1.loginsession import LoginSession
+from mini_project_1.register import valid_password, \
+    register_member, valid_name, valid_phone, valid_email
 from mini_project_1.offer_ride import get_offer_ride_parser, check_valid_cno, offer_ride
 from mini_project_1.post_request import get_post_request_parser
 from mini_project_1.search_requests import \
@@ -46,7 +48,8 @@ class MiniProjectShell(cmd.Cmd):
     prompt = "mini-project-1>"
     login_session: LoginSession = None
 
-    def __init__(self, database: sqlite3.Connection):
+    def __init__(self, database: sqlite3.Connection,
+                 register_start: bool = False):
         """Initialize the mini-project-1 shell
 
         :param database: :class:`sqlite3.Connection` to the database to
@@ -54,9 +57,12 @@ class MiniProjectShell(cmd.Cmd):
         """
         super().__init__()
         self.database = database
+        self.register_start = register_start
 
     def cmdloop(self, intro=None):
         # start a login command at start.
+        if self.register_start:
+            self.do_register(None)
         self.do_login(None)
         super().cmdloop()
 
@@ -69,6 +75,7 @@ class MiniProjectShell(cmd.Cmd):
         if self.login_session:
             __log__.error("already logged in")
         else:
+            print("Login to mini-project-1 database:")
             username = str(input("username: "))
             password = getpass("password: ")
             self.login(username, password)
@@ -539,6 +546,45 @@ class MiniProjectShell(cmd.Cmd):
         """Parser help message for selecting a ride request"""
         parser = get_select_request_parser()
         parser.print_help()
+
+    def do_register(self, arg):
+        """Register a new member to the mini-project-1 database"""
+        # get a valid email
+        print("Starting member registration wizard:")
+        while True:
+            email_str = input("email: ")
+            if valid_email(self.database, email_str):
+                email_str = valid_email(self.database, email_str)
+                break
+
+        # get valid name
+        while True:
+            name_str = input("name: ")
+            if valid_name(name_str):
+                break
+
+        # get valid phone
+        while True:
+            phone_str = input("phone: ")
+            if valid_phone(phone_str):
+                phone_str = valid_phone(phone_str)
+                break
+
+        # get valid password
+        while True:
+            password1 = getpass("password: ")
+            if not valid_password(password1):
+                continue
+            password2 = getpass("validate password: ")
+            if password1 != password2:
+                print("passwords do not match")
+                continue
+            else:
+                break
+
+        # finally register the new user
+        register_member(
+            self.database, email_str, name_str, phone_str, password1)
 
     # ===============================
     # Shell functionality definitions

@@ -53,6 +53,12 @@ def get_parser() -> argparse.ArgumentParser:
         description="Start the mini-project-1 shell"
     )
 
+    parser.add_argument("-r", "--register", dest="register",
+                        action="store_true",
+                        help="Before reaching the login screen access the "
+                             "registration screen to register a new member "
+                             "to the mini-project-1 database")
+
     group = parser.add_argument_group(title="Database")
     group = group.add_mutually_exclusive_group(required=True)
     group.add_argument("-d", "--database",
@@ -116,7 +122,8 @@ def main(argv=sys.argv[1:]) -> int:
     conn = sqlite3.connect(args.database or args.init_database)
 
     __log__.info("starting mini-project-1 shell")
-    MiniProjectShell(conn).cmdloop()
+    MiniProjectShell(conn, register_start=args.register).cmdloop()
+
     return 0
 
 

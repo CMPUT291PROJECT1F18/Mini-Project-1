@@ -60,8 +60,7 @@ setup(
     include_package_data=True,
     entry_points={
         "console_scripts": [
-            "mini-project-1 = mini_project_1.__main__:main",
-            "mini-project-1-register = mini_project_1.register:main"
+            "mini-project-1 = mini_project_1.__main__:main"
         ]
     },
     install_requires=[

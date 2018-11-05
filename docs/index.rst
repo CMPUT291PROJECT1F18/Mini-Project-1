@@ -11,7 +11,6 @@ This code is open source, and is `available on GitHub`_.
 
    Overview<readme>
    Shell Startup Command Line Usage<commands>
-   Registration Command Line Usage<registration>
 
 
 Indices and tables
