@@ -1,4 +1,4 @@
-Project Members:
+miniProject Members:
     * nklapste - Nathan Klapstein
     * rfurrer - Ryan Furrer
     * tlorincz- Ryan Furrer

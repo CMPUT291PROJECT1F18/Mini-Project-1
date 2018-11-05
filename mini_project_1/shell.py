@@ -12,13 +12,15 @@ import pendulum
 
 from mini_project_1.cancel_booking import get_cancel_booking_parser
 from mini_project_1.common import ShellArgumentException, \
-    MINI_PROJECT_DATE_FMT
+    MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, get_selection, send_message
 from mini_project_1.delete_ride_request import get_delete_ride_request_parser
 from mini_project_1.loginsession import LoginSession
+from mini_project_1.offer_ride import get_offer_ride_parser, check_valid_cno, offer_ride
 from mini_project_1.post_ride_request import get_post_ride_request_parser
 from mini_project_1.search_ride_requests import \
     get_search_ride_requests_by_city_name_parser, \
     get_search_ride_requests_by_location_code_parser
+from mini_project_1.search_rides import get_search_for_ride_parser
 from mini_project_1.select_ride_request import get_select_ride_request_parser
 
 __log__ = getLogger(__name__)
@@ -114,12 +116,100 @@ class MiniProjectShell(cmd.Cmd):
     @logged_in
     def do_offer_ride(self, arg):
         """Offer a ride"""
-        # TODO:
+        dbcursor = self.database.cursor()
+        parser = get_offer_ride_parser()
+        try:
+            args = parser.parse_args(arg.split())
+            try:
+                source = get_location_id(dbcursor, args.src, "Choose a source: ")
+                destination = get_location_id(dbcursor, args.dst, "Choose a destination: ")
+            except ValueNotFoundException as e:
+                print(e)
+                raise ShellArgumentException
+
+            enroute = set()
+            for place in args.enroute:
+                try:
+                    enroute.add(get_location_id(dbcursor, place, "Which place did you want to add? "))
+                except ValueNotFoundException as e:
+                    print(e)
+
+            if not check_valid_cno(dbcursor, args.cno, self.login_session):
+                args.cno = None
+
+            if offer_ride(self.database, self.login_session, args.date.to_datetime_string(), args.seats, args.price,
+                       args.luggage, source, destination, args.cno, enroute):
+                print("Added ride")
+            else:
+                print("Could not add ride")
+        except ShellArgumentException:
+            __log__.error("invalid offer_ride argument")
+
+
+    def help_offer_ride(self):
+        """Parser help message for offering a ride"""
+        parser = get_offer_ride_parser()
+        parser.print_help()
+
 
     @logged_in
     def do_search_rides(self, arg):
         """Search for ride"""
-        # TODO:
+        dbcursor = self.database.cursor()
+        parser = get_search_for_ride_parser()
+        try:
+            args = parser.parse_args(arg.split())
+            search_conditions = "(l1.lcode = ? OR l1.city LIKE ? OR l1.prov LIKE ? OR l1.address LIKE ? OR " + \
+                "l2.lcode = ? OR l2.city LIKE ? OR l2.prov LIKE ? OR l2.address LIKE ? OR " + \
+                "l3.lcode = ? OR l3.city LIKE ? OR l3.prov LIKE ? OR l3.address LIKE ?)"
+
+            # setup query conditions for one term
+            search_string = search_conditions
+            search_vars = (args.term1, '%'+args.term1+'%', '%'+args.term1+'%', '%'+args.term1+'%',
+                           args.term1, '%'+args.term1+'%', '%'+args.term1+'%', '%'+args.term1+'%',
+                           args.term1, '%'+args.term1+'%', '%'+args.term1+'%', '%'+args.term1+'%')
+            # add query conditions for the second term if supplied
+            if args.term2:
+                search_string = search_string + " AND " + search_conditions
+                more_search_vars = (args.term2, '%'+args.term2+'%', '%'+args.term2+'%', '%'+args.term2+'%',
+                                    args.term2, '%'+args.term2+'%', '%'+args.term2+'%', '%'+args.term2+'%',
+                                    args.term2, '%'+args.term2+'%', '%'+args.term2+'%', '%'+args.term2+'%')
+                search_vars = search_vars + more_search_vars
+
+            # add query conditions for the third term if supplied
+            if args.term3:
+                search_string = search_string + " AND " + search_conditions
+                more_search_vars = (args.term3, '%'+args.term3+'%', '%'+args.term3+'%', '%'+args.term3+'%',
+                                    args.term3, '%'+args.term3+'%', '%'+args.term3+'%', '%'+args.term3+'%',
+                                    args.term3, '%'+args.term3+'%', '%'+args.term3+'%', '%'+args.term3+'%')
+                search_vars = search_vars + more_search_vars
+
+            query = "SELECT r.* " + \
+                    "FROM locations l1, locations l2, rides r " + \
+                    "LEFT JOIN enroute en on en.rno = r.rno " + \
+                    "LEFT JOIN locations l3 on en.lcode = l3.lcode " + \
+                    "WHERE l1.lcode = r.src AND l2.lcode = r.dst AND "+search_string+";"
+
+            dbcursor.execute(query, search_vars)
+            results = dbcursor.fetchall()
+
+            # display matching
+            if len(results):
+                selection = get_selection(results)
+                # message the posting ride member
+                if selection:
+                    send_message(self.database, selection[7], self.login_session.get_email(),
+                                 "I want to book seats on this ride", selection[0])
+                    print("Message sent to driver")
+            else:
+                print("No results")
+        except ShellArgumentException:
+            __log__.error("invalid offer_ride argument")
+
+    def help_search_rides(self):
+        """Parser help message for offering a ride"""
+        parser = get_search_for_ride_parser()
+        parser.print_help()
 
     @logged_in
     def do_list_bookings(self, arg):
@@ -165,6 +255,7 @@ class MiniProjectShell(cmd.Cmd):
                 self.do_list_bookings(self)
                 return
 
+
             cur.execute(
                 "DELETE FROM bookings "
                 "WHERE EXISTS("
@@ -176,6 +267,7 @@ class MiniProjectShell(cmd.Cmd):
                 "AND b2.rno = rides.rno)",
                 (args.bno, self.login_session.get_email(),)
             )
+            
             self.database.commit()
             print("Successfully deleted:\n{}".format(to_delete))
 
