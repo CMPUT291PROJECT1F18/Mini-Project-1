@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""functionality defining the ``search_ride_request`` requirement
+"""functionality defining the ``search_request`` requirement
 
 The member should be able to see all his/her ride requests. Also the member
 should be able to provide a location code or a city and see a listing of all
@@ -14,7 +14,7 @@ posting member, for example asking the member to check out a ride.
 from mini_project_1.common import ShellArgumentParser
 
 
-def get_search_ride_requests_by_location_code_parser() -> ShellArgumentParser:
+def get_search_requests_lcode_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
         description="Search ride requests by location code")
@@ -24,7 +24,7 @@ def get_search_ride_requests_by_location_code_parser() -> ShellArgumentParser:
     return parser
 
 
-def get_search_ride_requests_by_city_name_parser() -> ShellArgumentParser:
+def get_search_requests_city_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
         description="Search ride requests by city name")

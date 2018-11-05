@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""functionality defining the ``select_ride_request`` requirement"""
+"""functionality defining the ``select_request`` requirement"""
 
 from mini_project_1.common import ShellArgumentParser
 
 
-def get_select_ride_request_parser() -> ShellArgumentParser:
+def get_select_request_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
         description="Select a ride request and perform actions with it"

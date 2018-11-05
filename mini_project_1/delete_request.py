@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""functionality defining the ``delete_ride_request`` requirement
+"""functionality defining the ``delete_request`` requirement
 
 The member should be able to delete any of his/her ride requests.
 """
@@ -9,7 +9,7 @@ The member should be able to delete any of his/her ride requests.
 from mini_project_1.common import ShellArgumentParser
 
 
-def get_delete_ride_request_parser() -> ShellArgumentParser:
+def get_delete_request_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
         description="Delete a ride request by rid")
