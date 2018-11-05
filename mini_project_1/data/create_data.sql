@@ -146,7 +146,12 @@ insert into requests values
         (6, 'marty@mc.fly', '2018-10-11', 'sk1', 'sth3', 10),
         (7, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 1),
         (8, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100),
-        (9, 'jane_doe@abc.ca', '2018-04-26', 'cntr3', 'cntr2', 10);
+        (9, 'jane_doe@abc.ca', '2018-04-26', 'cntr3', 'cntr2', 10),
+        (10, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100),
+        (11, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100),
+        (12, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100),
+        (13, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100),
+        (14, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100);
 
 -- |email|msgTimestamp|sender|content|rno|seen|
 insert into inbox values
