@@ -20,7 +20,7 @@ jobs:
   include:
     - stage: test
       script:
-      - python setup.py test || if [ $? -eq 1 -o $? -eq 5 ]; then exit 0 ;  fi;
+      - python setup.py test
       name: "test"
     - script:
       - python setup.py lint || exit $(($? & 35))
