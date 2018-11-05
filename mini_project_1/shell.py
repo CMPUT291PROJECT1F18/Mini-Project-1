@@ -230,7 +230,6 @@ class MiniProjectShell(cmd.Cmd):
     @logged_in
     def do_book_member(self, arg):
         """Book other members on a ride"""
-        cur = self.database.cursor()
         parser = get_book_member_parser()
 
         try:
