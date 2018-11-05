@@ -3,58 +3,58 @@ The design document should include
 (b) a detailed design of your software with a focus on the components required to 
 deliver the major functions of your application, 
 (c) your testing strategy, and 
-(d) your group work break-down strategy. 
-
-The general overview of the system gives a high level introduction and 
-may include a diagram showing the flow of data between different components; 
-this can be useful for both users and developers of your application. 
+(d) your group work break-down strategy.
 
 Overview:
 
 mini_project_1 is a python cli application that either takes in a database or creates one. It takes
-commands with parameters from the command line and valid coammand query a sqlite database for results.
-This database then returns info to the python program for displaying to the user.
+commands with parameters from the command line, validates them (using python and the database), and then querys
+the sqlite database for results. This database then returns info to the python program for displaying to the user.
+
+TODO: input user guide from readme.rst
 
 
 The detailed design of your software should describe the responsibility and interface of each primary function
  or class (not secondary utility functions/classes) and the structure and relationships among them. 
 Depending on the programming language being used, you may have methods, functions or classes. 
 
-Detailed Design:
+Detailed Design: TODO: wait until refactoring is done?
 
-1. Account Creation and Login
+1. Shell
 
-2. Rides
+2. Common
 
-3. Bookings
+3. Account Creation and Login
 
-4. Ride requests
+4. Rides
+
+5. Bookings
+
+6. Ride requests
 
 
-
-The testing strategy discusses your general strategy for testing, with the scenarios being tested, 
-the coverage of your test cases and (if applicable) some statistics on the number of bugs found and 
-the nature of those bugs. 
 
 Testing Strategy:
 
-Testing mainly made the use of partitions. Each function's inputs were divided into valid and invalid
-inputs and test cases were run for them.
+Testing mainly made the use of partitions. In order to test our code, our program can generate an
+populate a sqlite database.Each function's inputs were divided into valid and invalid inputs
+and a test cases was created for each invalid input and enough test cases were tested to cover
+the valid partitions.
+
+with the scenarios being tested,
+the coverage of your test cases and
+(if applicable) some statistics on the number of bugs found and the nature of those bugs.
 
 
 
-The group work strategy must list the break-down of the work items among partners, 
-both the time spent (an estimate) and the progress made by each partner, and your 
-method of coordination to keep the project on track. 
-
-Break-down of the work:
+Break-down of the work: TODO: fill our contri
   * nklapste - Nathan Klapstein
 	Hours:
 	Progress made:
 
   * rfurrer - Ryan Furrer
-	Hours:
-	Progress made:
+	Hours: 15ish hours
+	Progress made: main contributions were the book a member, offer ride and search rides functionality
 
   * tlorincz- Thomas Lorincz
 	Hours:
@@ -62,9 +62,9 @@ Break-down of the work:
 
 Work Coordination:
 
-We primary coordinated through Github. A orgination was set up for the project and each task was 
-broken down into issue tickets. These tickets were assigned to members and work was done each pull
-request was associated with an issue, to measure progress, and when an issue was done the assigned 
+We primary coordinated through Github. A organization was set up for the project and each task was
+broken down into issue tickets. These tickets were assigned to members and each pull request was
+associated with an issue, to measure progress, and when an issue was done the assigned
 member would close the issue.
 
-Design decisions differing from requirements:
+Design decisions differing from requirements: TODO: say none?

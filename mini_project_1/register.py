@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""registration to a mini-project-1 database"""
+"""register a new member to a mini-project-1 database"""
 
 import re
 import sqlite3
@@ -82,4 +82,3 @@ def register_member(database: sqlite3.Connection, email: str, name: str,
     database.commit()
     __log__.info("registered user: email: {} name: {} phone: {}".format(
                     email, name, phone))
-
