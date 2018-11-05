@@ -72,17 +72,20 @@ def test_logout(mock_db):
 
 
 def test_register(mock_db):
+    """"""
     database = sqlite3.connect(mock_db)
     shell = MiniProjectShell(database)
 
 
 def test_select_request(mock_db):
+    """"""
     database = sqlite3.connect(mock_db)
     shell = MiniProjectShell(database)
     shell.login("bob@123.ca", "foo")
 
 
 def test_delete_request(mock_db):
+    """"""
     database = sqlite3.connect(mock_db)
     shell = MiniProjectShell(database)
     shell.login("bob@123.ca", "foo")

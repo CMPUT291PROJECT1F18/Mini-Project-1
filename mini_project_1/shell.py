@@ -64,6 +64,7 @@ class MiniProjectShell(cmd.Cmd):
         if self.register_start:
             self.do_register(None)
         self.do_login(None)
+        self.do_show_inbox(None)
         super().cmdloop()
 
     # ===============================
@@ -81,7 +82,6 @@ class MiniProjectShell(cmd.Cmd):
             self.login(username, password)
             while not self.login_session:
                 self.do_login(None)
-            self.do_show_inbox(None)
 
     @logged_in
     def do_logout(self, arg):
