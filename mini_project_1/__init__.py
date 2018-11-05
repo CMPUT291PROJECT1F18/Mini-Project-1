@@ -17,6 +17,7 @@ Modules:
  + :mod:`.delete_ride_request`
  + :mod:`.post_ride_request`
  + :mod:`.search_ride_request`
+ + :mod:`.select_ride_request`
  + :mod:`.cancel_booking`
  + :mod:`.common` - common functionality used in mini-project-1
 """

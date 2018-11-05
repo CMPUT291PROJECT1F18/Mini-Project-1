@@ -12,13 +12,14 @@ import pendulum
 
 from mini_project_1.cancel_booking import get_cancel_booking_parser
 from mini_project_1.common import ShellArgumentException, \
-    MINI_PROJECT_DATE_FMT, ShellArgumentParser
+    MINI_PROJECT_DATE_FMT
 from mini_project_1.delete_ride_request import get_delete_ride_request_parser
 from mini_project_1.loginsession import LoginSession
 from mini_project_1.post_ride_request import get_post_ride_request_parser
 from mini_project_1.search_ride_requests import \
     get_search_ride_requests_by_city_name_parser, \
     get_search_ride_requests_by_location_code_parser
+from mini_project_1.select_ride_request import get_select_ride_request_parser
 
 __log__ = getLogger(__name__)
 
@@ -467,16 +468,3 @@ def print_5_and_prompt(rows):
     else:
         for row in rows:
             print(row)
-
-
-# TODO: what is this needed for
-def get_select_ride_request_parser() -> ShellArgumentParser:
-    parser = ShellArgumentParser(
-        add_help=False,
-        description="Select a ride request and perform actions with it"
-    )
-    
-    parser.add_argument("rid", type=int,
-                        help="The ID of the ride request to delete")
-    
-    return parser
