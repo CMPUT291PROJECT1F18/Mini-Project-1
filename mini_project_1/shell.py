@@ -93,10 +93,11 @@ class MiniProjectShell(cmd.Cmd):
             "FROM inbox "
             "WHERE inbox.email = ?",
             (self.login_session.get_email(),)).fetchall()
+        print("Your inbox:")
         for inbox_item in inbox_items:
             print(inbox_item)
 
-        # set all messages within your inbox as seen="T"
+        # set all messages within your inbox as seen="y"
         self.database.execute(
             "UPDATE inbox "
             "SET seen='y' " 
@@ -305,6 +306,51 @@ class MiniProjectShell(cmd.Cmd):
         """Parser help message for deleting a ride request"""
         parser = get_delete_ride_request_parser()
         parser.print_help()
+        
+    def do_select_ride_request(self, arg):
+        """Select a ride request and perform actions"""
+        cur = self.database.cursor()
+        parser = get_select_ride_request_parser()
+        
+        try:
+            args = parser.parse_args(arg.split())
+            
+            select_request = "SELECT * FROM requests " \
+                             "WHERE rid=?;"
+            cur.execute(select_request, (args.rid,))
+            selected = cur.fetchone()
+
+            print("You have selected: {}".format(selected))
+            while True:
+                response = \
+                    input("Would you like to message the poster? [y|n]\n")
+                if response == "y":
+                    message = input("Your message: ")
+                    get_poster = "SELECT email from requests " \
+                                 "WHERE rid=?;"
+                    cur.execute(get_poster, (args.rid,))
+                    poster = cur.fetchone()[0]
+
+                    send_to_inbox = "INSERT INTO inbox values " \
+                                    "(?, ?, ?, ?, ?, ?);"
+                    cur.execute(send_to_inbox,
+                                (poster,
+                                 pendulum.now().to_datetime_string(),
+                                 self.login_session.get_email(),
+                                 message,
+                                 0,  # TODO: What to put here?
+                                 "n"))
+                    self.database.commit()
+                    break
+                elif response == "n":
+                    break
+        except ShellArgumentException:
+            __log__.error("invalid argument")
+
+    def help_select_ride_request(self):
+        """Parser help message for selecting a ride request"""
+        parser = get_select_ride_request_parser()
+        parser.print_help()
 
     # ===============================
     # Shell functionality definitions
@@ -473,4 +519,15 @@ def get_delete_ride_request_parser() -> ShellArgumentParser:
     parser.add_argument("rid", type=int,
                         help="The ID of the ride request to delete")
 
+    return parser
+
+
+def get_select_ride_request_parser() -> ShellArgumentParser:
+    parser = ShellArgumentParser(
+        add_help=False,
+        description="Select a ride request and perform actions with it")
+    
+    parser.add_argument("rid", type=int,
+                        help="The ID of the ride request to delete")
+    
     return parser

@@ -150,4 +150,4 @@ insert into requests values
 
 -- |email|msgTimestamp|sender|content|rno|seen|
 insert into inbox values
-        ('bob@123.ca', '2018-08-23', 'don@mayor.yeg', 'test message from your mayor!', 2, 'F')
+        ('bob@123.ca', '2018-08-23 21:12:50', 'don@mayor.yeg', 'test message from your mayor!', 2, 'n')
