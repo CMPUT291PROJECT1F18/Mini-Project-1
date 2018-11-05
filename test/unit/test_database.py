@@ -73,12 +73,14 @@ def test_logout(mock_db):
 
 
 def test_check_valid_email_valid(mock_db):
+    """Test valid_email with valid emails"""
     database = sqlite3.connect(mock_db)
     # check for a valid new unique email
     assert valid_email(database, "cra@example.com")
 
 
 def test_check_valid_email_invalid(mock_db):
+    """Test valid_email with invalid emails"""
     database = sqlite3.connect(mock_db)
     # check for a invalid new unique email
     assert not valid_email(database, "")
@@ -88,32 +90,38 @@ def test_check_valid_email_invalid(mock_db):
 
 
 def test_valid_password_valid():
+    """Test valid_password with valid passwords"""
     assert valid_password("123456")
     assert valid_password("abcdef")
 
 
 def test_valid_password_invalid():
+    """Test valid_password with invalid passwords"""
     assert not valid_password("")
     assert not valid_password("1234567")
     assert not valid_password("abcdefg")
 
 
 def test_valid_name_valid():
+    """Test valid_name with valid names"""
     assert valid_name("1")
     assert valid_name("a"*20)
 
 
 def test_valid_name_invalid():
+    """Test valid_name with invalid names"""
     assert not valid_name("")
     assert not valid_name("a"*21)
 
 
 def test_valid_phone_valid():
+    """Test valid_phone with valid phone numbers"""
     assert valid_phone("000-000-0000")
     assert valid_phone("0000000000")
 
 
 def test_valid_phone_invalid():
+    """Test valid_phone with invalid phone numbers"""
     assert not valid_phone("")
     assert not valid_phone("000-000-00000")
     assert not valid_phone("000-0000-0000")
