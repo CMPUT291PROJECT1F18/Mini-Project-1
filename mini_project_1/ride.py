@@ -1,6 +1,8 @@
 import sqlite3
 from datetime import datetime
 
+import pendulum
+
 from mini_project_1.loginsession import LoginSession
 
 """
@@ -8,15 +10,12 @@ Offer a ride.
 The member should be able to offer rides by providing a date, the number of seats offered,
 the price per seat, a luggage description, a source location, and a destination location.
 The member should have the option of adding a car number and any set of enroute locations.
-
-For locations (including source, destination and enroute), the member should be able to provide a keyword,
-which can be a location code. If the keyword is not a location code, your system should return all locations
-that have the keyword as a substring in city, province or address fields. If there are more than 5 matching locations,
-at most 5 matches will be shown at a time, letting the member select a location or see more matches.
-If a car number is entered, your system must ensure that the car belongs to the member.
-Your system should automatically assign a unique ride number (rno) to the ride and set the member
-as the driver of the ride.
 """
+
+
+class ValueNotFoundException(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
 
 
 def get_selection(items: list):
@@ -35,27 +34,26 @@ def get_selection(items: list):
 
             if selection.isnumeric():
                 selection = int(selection)
-                if selection < len(items):
-                    return selection
+                if 0 < selection < len(items):
+                    return items[selection]
+            elif selection == "exit":
+                return None
         elif index + 1 == len(items):
             selection = str(input("Enter selection number: "))
 
             if selection.isnumeric():
                 selection = int(selection)
-                if selection < len(items):
-                    return selection
+                if 0 < selection < len(items):
+                    return items[selection]
+            elif selection == "exit":
+                return None
             index = -1
             print("An entry must be selected")
         index += 1
 
 
-def get_location_id(dbcursor: sqlite3.Cursor, prompt: str = ""):
+def get_location_id(dbcursor: sqlite3.Cursor, keyword: str, prompt:str = None):
     """Gets a location lcode from the user."""
-    print(prompt)
-    keyword = str(input("Enter location keyword (exit to leave): "))
-
-    if keyword == "exit":
-        raise ConnectionAbortedError
 
     # get exact match locde
     dbcursor.execute(
@@ -73,26 +71,13 @@ def get_location_id(dbcursor: sqlite3.Cursor, prompt: str = ""):
 
     # display and get user selection if more than one
     if len(locations) > 1:
+        if prompt:
+            print(prompt)
         return get_selection(locations)[0]
     elif locations:
         return locations[0][0]
     else:
-        print("No locations for %s" % keyword)
-        raise LookupError
-
-
-def get_date_from_user(prompt: str = 'Enter the date (YYYY-MM-DD): '):
-    """ Gets and returns a date from the user """
-    while 1:
-        date = str(input(prompt))
-        try:
-            if date == "exit":
-                raise ConnectionAbortedError("Could not get date")
-            date = datetime.strptime(date, '%Y-%m-%d')
-            return date
-        except ValueError:
-            print("Incorrect format")
-    pass
+        raise ValueNotFoundException("No location for "+keyword)
 
 
 def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: LoginSession):
@@ -103,80 +88,20 @@ def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: LoginSession):
     return False
 
 
-def get_ride_offer_info(dbcursor: sqlite3.Cursor, member: LoginSession):
-    date = num_of_seats = price_per_seat = luggage_desc = source = destination = None
-
-    try:
-        date = get_date_from_user()
-    except ConnectionAbortedError:
-        print("Aborting: You must give a date.")
-        return
-
-    try:
-        while True:
-            num_of_seats = int(input("Enter number of seats: "))
-            if num_of_seats > 0:
-                break
-        while True:
-            price_per_seat = int(input("Enter price per seat: "))
-            if num_of_seats >= 0:
-                price_per_seat
-    except ValueError:
-        print("Aborting: You must give a number")
-        return
-
-    luggage_desc = str(input("Enter luggage description: "))
-
-    try:
-        source = get_location_id(dbcursor, "Enter the ride source location: ")
-        destination = get_location_id(dbcursor, "Enter the ride destination location: ")
-    except ConnectionAbortedError:
-        print("Aborting: You must give locations to offer a ride")
-        return
-    except LookupError:
-        return
-
-    enroute = set()
-
-    while True:
-        try:
-            enroute.add(get_location_id(dbcursor, "Enter a enroute location: "))
-        except ConnectionAbortedError:
-            break
-        except LookupError:
-            print("No locations for that keyword")
-
-    wants_to_add_cno = str(input("Do you want to add a car number? [y] or [n]")) == 'y'
-    cno = None
-
-    while wants_to_add_cno:
-        try:
-            cno = int(input("Enter a car number or exit: "))
-            if check_valid_cno(dbcursor, cno, member):
-                break
-            print("You must give the car number of one of your cars")
-        except ValueError:
-            print("Please enter a number.")
-
-    return date, num_of_seats, price_per_seat, luggage_desc, source, destination, cno, enroute
-
-
-def offer_ride(database: sqlite3.Connection, member: LoginSession):
+def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulum.DateTime, seats: int,
+               price: int, luggage: str, source: str, destination: str, cno: str = None, enroute: set = set()):
     """
     Tries to add a ride to the database for the member
     :return: if a ride has been added (True/False)
     """
-
     dbcursor = database.cursor()
-    ride_offer_info = get_ride_offer_info(dbcursor, member)
+    dbcursor.execute("SELECT MAX(rno) FROM rides")
+    rno = str(int(dbcursor.fetchone()[0]) + 1)
+    print(rno, price, date, seats, luggage, source, destination, member.get_email())
+    print(cno)
+    print(enroute)
 
-    if ride_offer_info:
-        date, seats, price, luggage, source, destination, cno, enroute = ride_offer_info
-
-        dbcursor.execute("SELECT MAX(rno) FROM rides")
-        rno = str(int(dbcursor.fetchone()[0]) + 1)
-
-        # TODO: more error checking? sqlite3.OperationalError & sqlite3.IntegrityError
+    try:
         dbcursor.execute(
             "INSERT INTO rides (rno, price, rdate, seats, lugDesc, src, dst, driver) VALUES " +
             "(?, ?, ?, ?, ?, ?, ?, ?)", (rno, price, date, seats, luggage, source, destination, member.get_email()))
@@ -186,10 +111,15 @@ def offer_ride(database: sqlite3.Connection, member: LoginSession):
 
         for place in enroute:
             dbcursor.execute("INSERT INTO enroute (rno, lcode) VALUES (?, ?)", (rno, place))
+    except sqlite3.OperationalError as e:
+        print(e)
+        return False
+    except sqlite3.IntegrityError as e:
+        print(e)
+        return False
 
-        database.commit()
-        return True
-    return False
+    database.commit()
+    return True
 
 
 """

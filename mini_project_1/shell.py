@@ -11,6 +11,7 @@ from getpass import getpass
 from logging import getLogger
 
 import pendulum
+from mini_project_1.ride import get_selection, get_location_id, offer_ride, ValueNotFoundException, check_valid_cno
 
 from mini_project_1.loginsession import LoginSession
 
@@ -80,12 +81,94 @@ class MiniProjectShell(cmd.Cmd):
     @logged_in
     def do_offer_ride(self, arg):
         """Offer a ride"""
-        # TODO:
+        dbcursor = self.database.cursor()
+        parser = get_offer_ride_parser()
+        try:
+            args = parser.parse_args(arg.split())
+            try:
+                source = get_location_id(dbcursor, args.src, "Choose a source: ")
+                destination = get_location_id(dbcursor, args.dst, "Choose a destination: ")
+            except ValueNotFoundException as e:
+                print(e)
+                raise ShellArgumentException
+
+            enroute = set()
+            for place in args.enroute:
+                try:
+                    enroute.add(get_location_id(dbcursor, place, "Which place did you want to add? "))
+                except ValueNotFoundException as e:
+                    print(e)
+
+            if not check_valid_cno(dbcursor, args.cno, self.login_session):
+                args.cno = None
+
+            if offer_ride(self.database, self.login_session, args.date.to_datetime_string(), args.seats, args.price,
+                       args.luggage, source, destination, args.cno, enroute):
+                print("Added ride")
+            else:
+                print("Could not add ride")
+        except ShellArgumentException:
+            __log__.error("invalid offer_ride argument")
+
+
+    def help_offer_ride(self):
+        """Parser help message for offering a ride"""
+        parser = get_offer_ride_parser()
+        parser.print_help()
+
 
     @logged_in
     def do_search_rides(self, arg):
         """Search for ride"""
-        # TODO:
+        dbcursor = self.database.cursor()
+        parser = get_search_for_ride_parser()
+        try:
+            args = parser.parse_args(arg.split())
+            search_conditions = "(l1.lcode = ? OR l1.city LIKE ? OR l1.prov LIKE ? OR l1.address LIKE ? OR " + \
+                "l2.lcode = ? OR l2.city LIKE ? OR l2.prov LIKE ? OR l2.address LIKE ? OR " + \
+                "l3.lcode = ? OR l3.city LIKE ? OR l3.prov LIKE ? OR l3.address LIKE ?)"
+
+            search_string = search_conditions
+            search_vars = (args.term1, '%'+args.term1+'%', '%'+args.term1+'%', '%'+args.term1+'%',
+                           args.term1, '%'+args.term1+'%', '%'+args.term1+'%', '%'+args.term1+'%',
+                           args.term1, '%'+args.term1+'%', '%'+args.term1+'%', '%'+args.term1+'%')
+            if args.term2:
+                search_string = search_string + " AND " + search_conditions
+                more_search_vars = (args.term2, '%'+args.term2+'%', '%'+args.term2+'%', '%'+args.term2+'%',
+                                    args.term2, '%'+args.term2+'%', '%'+args.term2+'%', '%'+args.term2+'%',
+                                    args.term2, '%'+args.term2+'%', '%'+args.term2+'%', '%'+args.term2+'%')
+                search_vars = search_vars + more_search_vars
+
+            if args.term3:
+                search_string = search_string + " AND " + search_conditions
+                more_search_vars = (args.term3, '%'+args.term3+'%', '%'+args.term3+'%', '%'+args.term3+'%',
+                                    args.term3, '%'+args.term3+'%', '%'+args.term3+'%', '%'+args.term3+'%',
+                                    args.term3, '%'+args.term3+'%', '%'+args.term3+'%', '%'+args.term3+'%')
+                search_vars = search_vars + more_search_vars
+
+            query = "SELECT r.* " + \
+                    "FROM locations l1, locations l2, rides r " + \
+                    "LEFT JOIN enroute en on en.rno = r.rno " + \
+                    "LEFT JOIN locations l3 on en.lcode = l3.lcode " + \
+                    "WHERE l1.lcode = r.src AND l2.lcode = r.dst AND "+search_string+";"
+
+            print(query)
+            print(search_vars)
+            results = dbcursor.execute(query, search_vars)
+            # display matching
+            selection = get_selection(results)
+            # message the posting ride member
+            if selection:
+                send_message(self.database, selection[7], self.login_session.get_email(),
+                             "I want to book seats on this ride", selection[0])
+        except ShellArgumentException:
+            __log__.error("invalid offer_ride argument")
+
+
+    def help_search_rides(self):
+        """Parser help message for offering a ride"""
+        parser = get_search_for_ride_parser()
+        parser.print_help()
 
     @logged_in
     def do_list_bookings(self, arg):
@@ -134,7 +217,7 @@ class MiniProjectShell(cmd.Cmd):
                              "AND bookings.bno=b2.bno " \
                              "AND rides.driver=?" \
                              "AND b2.rno = rides.rno);"
-            
+
             cur.execute(cancel_booking,
                         (args.bno, self.login_session.get_email(),))
             self.database.commit()
@@ -317,6 +400,17 @@ class ShellArgumentParser(argparse.ArgumentParser):
         raise ShellArgumentException(message)
 
 
+def send_message(database: sqlite3.Connection, recipient: str, sender: str, content: str, rno: int):
+    """"""
+    cur = database.cursor()
+
+    send_query = "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);"
+    cur.execute(send_query,
+                (recipient, pendulum.now().to_datetime_string(),
+                 sender, content, rno, "n"))
+    database.commit()
+
+
 def print_5_and_prompt(rows):
     if len(rows) > 5:
         print("First 5 rows:")
@@ -344,6 +438,13 @@ def price(price_string: str) -> int:
     return price
 
 
+def greater_than_zero_number(value: str) -> int:
+    value = int(value)
+    if value <= 0:
+        raise argparse.ArgumentTypeError("%s must be a greater than zero number" % value)
+    return value
+
+
 def date(date_str: str) -> pendulum.DateTime:
     return pendulum.parse(date_str)
 
@@ -361,6 +462,44 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
                         help="The location code for the dropoff location of the ride")
     parser.add_argument("price", type=price,
                         help="The maximum amount you are willing to pay per seat for the ride")
+    return parser
+
+
+def get_offer_ride_parser() -> ShellArgumentParser:
+    parser = ShellArgumentParser(
+        add_help=False,
+        description="Offer a ride")
+
+    # date, seats, price, luggage, source, destination, cno, enroute
+    parser.add_argument("date", type=date,
+                        help="Date the ride should start on")
+    parser.add_argument("seats", type=greater_than_zero_number,
+                        help="The number of seats offered")
+    parser.add_argument("price", type=price,
+                        help="The amount you want per seat for the ride")
+    parser.add_argument("luggage",
+                        help="Description of car luggage")
+    parser.add_argument("src",
+                        help="Keyword for the start location of the ride")
+    parser.add_argument("dst",
+                        help="Keyword for the end location of the ride")
+    parser.add_argument("--cno", nargs='?', default=None,
+                        help="Your car number to use")
+    parser.add_argument("--enroute", nargs='+', default=set(),
+                        help="Enroute locations to go to")
+    return parser
+
+
+def get_search_for_ride_parser() -> ShellArgumentParser:
+    parser = ShellArgumentParser(
+        add_help=False,
+        description="Offer a ride")
+    parser.add_argument("term1",
+                        help="Location search term to use to look rides")
+    parser.add_argument("term2", nargs='?', default=None,
+                        help="Location search term to use to look rides")
+    parser.add_argument("term3", nargs='?', default=None,
+                        help="Location search term to use to look rides")
     return parser
 
 
