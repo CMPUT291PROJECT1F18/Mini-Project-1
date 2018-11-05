@@ -223,7 +223,7 @@ class MiniProjectShell(cmd.Cmd):
             (self.login_session.get_email(),)
         )
         rows = cur.fetchall()
-        for row in rows:  # TODO: list max of five (get_selection(rows, ""))
+        for row in rows:
             print(row)
 
     @logged_in
@@ -399,7 +399,7 @@ class MiniProjectShell(cmd.Cmd):
             (self.login_session.get_email().lower(),)
         )
         rows = cur.fetchall()
-        for row in rows: # TODO: list max of five (get_selection(rows, ""))
+        for row in rows:
             print(row)
 
     @logged_in
