@@ -19,6 +19,7 @@ from mini_project_1.delete_request import get_delete_request_parser
 from mini_project_1.list_bookings import get_list_bookings_parser
 from mini_project_1.list_requests import get_list_ride_requests_parser
 from mini_project_1.loginsession import LoginSession
+from mini_project_1.logout import get_logout_parser
 from mini_project_1.register import valid_password, \
     register_member, valid_name, valid_phone, valid_email
 from mini_project_1.offer_ride import get_offer_ride_parser, check_valid_cno, offer_ride
@@ -89,7 +90,16 @@ class MiniProjectShell(cmd.Cmd):
     @logged_in
     def do_logout(self, arg):
         """Logout to the mini-project-1 database: logout"""
-        self.logout()
+        parser = get_logout_parser()
+        try:
+            parser.parse_args(arg.split())
+            self.logout()
+        except ShellArgumentException:
+            __log__.exception("invalid logout arguement")
+
+    def help_logout(self):
+        """Parser help message for logout"""
+        get_logout_parser().print_help()
 
     def do_exit(self, arg):
         """Logout (if needed) and exit out of the mini-project-1 shell: exit"""
