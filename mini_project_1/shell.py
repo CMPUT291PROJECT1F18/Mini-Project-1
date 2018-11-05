@@ -595,25 +595,3 @@ class MiniProjectShell(cmd.Cmd):
             raise ShellArgumentException(
                 "invalid location code: {}".format(location_code_str))
 
-
-def print_5_and_prompt(rows):
-    if len(rows) > 5:
-        index = 0
-        while index < len(rows)-1:
-            end_index = min(index + 5, len(rows)-1)
-            print("Rows {}-{}:".format(index+1, end_index))
-            for row in rows[index:end_index]:
-                print(row)
-            if end_index == len(rows)-1:
-                break
-            see_more = input(
-                "Enter 'more' to see 5 more results or enter "
-                "anything else to finish.\n").lower()
-            if see_more != "more":
-                break
-            else:
-                index = index + 5
-    else:
-        print("All rows:")
-        for row in rows:
-            print(row)

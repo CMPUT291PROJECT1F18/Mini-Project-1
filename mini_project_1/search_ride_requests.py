@@ -38,15 +38,22 @@ def print_5_and_prompt(rows):
     """Print out 5 rows and if more rows exist prompt the user
     if they want more. If the user enters ``all`` print the remaining rows."""
     if len(rows) > 5:
-        print("First 5 rows:")
-        for row in rows[:5]:
-            print(row)
-        see_more = input("Enter 'all' to see all results or enter anything "
-                         "else to finish.\n").lower()
-        if see_more == "all":
-            print("All rows:")
-            for row in rows:
+        index = 0
+        while index < len(rows)-1:
+            end_index = min(index + 5, len(rows)-1)
+            print("Rows {}-{}:".format(index+1, end_index))
+            for row in rows[index:end_index]:
                 print(row)
+            if end_index == len(rows)-1:
+                break
+            see_more = input(
+                "Enter 'more' to see 5 more results or enter "
+                "anything else to finish.\n").lower()
+            if see_more != "more":
+                break
+            else:
+                index = index + 5
     else:
+        print("All rows:")
         for row in rows:
             print(row)
