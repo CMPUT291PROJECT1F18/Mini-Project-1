@@ -74,11 +74,7 @@ def get_post_request_parser() -> ShellArgumentParser:
 
 def valid_location_code(database: sqlite3.Connection, location_code_str: str):
     """Validate that a location ode for use in ``post_ride_request``
-    command actually exists in locations
-
-    :raises: :class:`ShellArgumentException` if the given location code
-             is not within the ``locations`` table.
-    """
+    command actually exists in locations"""
 
     locations = database.execute(
         "SELECT lcode "
