@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""functionality defining the ``post_ride_request`` requirement
+"""Post a ride request
 
 Post ride requests. The member should be able to post a ride request
 by providing a date, a pick up location code, a drop off location code,
@@ -33,9 +33,9 @@ def price(price_string: str) -> int:
 def date(date_str: str) -> pendulum.DateTime:
     """Argparser type validation function for validating a date for use
     in ``post_ride_request`` command"""
-    date = pendulum.parse(date_str)
-    if date >= pendulum.today().subtract(days=1):
-        return date
+    parsed_date = pendulum.parse(date_str)
+    if parsed_date >= pendulum.today().subtract(days=1):
+        return parsed_date
     else:
         raise argparse.ArgumentTypeError(
             "invalid date: {} (please choose a date from today {} forwards)".format(

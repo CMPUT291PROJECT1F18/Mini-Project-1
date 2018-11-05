@@ -13,17 +13,18 @@ import pendulum
 from mini_project_1.book_member import get_book_member_parser, book_member
 from mini_project_1.cancel_booking import get_cancel_booking_parser
 from mini_project_1.common import ShellArgumentException, \
-    MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, get_selection, send_message, check_valid_email, \
-    check_valid_lcode
+    MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, \
+    get_selection, send_message, check_valid_email, check_valid_lcode
 from mini_project_1.delete_ride_request import get_delete_ride_request_parser
 from mini_project_1.loginsession import LoginSession
-from mini_project_1.offer_ride import get_offer_ride_parser, check_valid_cno, offer_ride
+from mini_project_1.offer_ride import get_offer_ride_parser, check_valid_cno, \
+    offer_ride
 from mini_project_1.post_ride_request import get_post_ride_request_parser
 from mini_project_1.register import valid_password, \
     register_member, valid_name, valid_phone, valid_email
 from mini_project_1.search_ride_requests import \
     get_search_ride_requests_by_city_name_parser, \
-    get_search_ride_requests_by_location_code_parser
+    get_search_ride_requests_by_location_code_parser, print_5_and_prompt
 from mini_project_1.search_rides import get_search_for_ride_parser
 from mini_project_1.select_ride_request import get_select_ride_request_parser
 
@@ -230,13 +231,12 @@ class MiniProjectShell(cmd.Cmd):
             (self.login_session.get_email(),)
         )
         rows = cur.fetchall()
-        for row in rows:  # TODO: list max of five (get_selection(rows, ""))
+        for row in rows:
             print(row)
 
     @logged_in
     def do_book_member(self, arg):
         """Book other members on a ride"""
-        cur = self.database.cursor()
         parser = get_book_member_parser()
 
         try:
@@ -287,7 +287,7 @@ class MiniProjectShell(cmd.Cmd):
                 send_message(self.database, args.email, self.login_session.get_email(),
                              "I have booked you on a ride", rno)
         except ShellArgumentException:
-            __log__.exception("invalid cancel_booking argument")
+            __log__.error("invalid book_member argument")
 
     def help_book_member(self):
         """Parser help message for booking a member"""
@@ -331,16 +331,12 @@ class MiniProjectShell(cmd.Cmd):
 
             self.database.commit()
             print("Successfully deleted:\n{}".format(to_delete))
-
-            send_message = "INSERT INTO inbox VALUES " \
-                           "(?, ?, ?, ?, ?, ?);"
-            cur.execute(send_message,
-                        (to_delete[1],
-                         pendulum.now().to_datetime_string(),
-                         self.login_session.get_email(),
-                         "Your booking has been cancelled.",
-                         to_delete[2],
-                         "n"))
+            cur.execute(
+                "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);",
+                (to_delete[1], pendulum.now().to_datetime_string(),
+                 self.login_session.get_email(), "Your booking has been cancelled.",
+                 to_delete[2], "n")
+            )
             self.database.commit()
             print("Successfully sent cancellation message to {}."
                   .format(to_delete[1]))
@@ -406,7 +402,7 @@ class MiniProjectShell(cmd.Cmd):
             (self.login_session.get_email().lower(),)
         )
         rows = cur.fetchall()
-        for row in rows: # TODO: list max of five (get_selection(rows, ""))
+        for row in rows:
             print(row)
 
     @logged_in
@@ -645,25 +641,3 @@ class MiniProjectShell(cmd.Cmd):
             raise ShellArgumentException(
                 "invalid location code: {}".format(location_code_str))
 
-
-def print_5_and_prompt(rows):
-    if len(rows) > 5:
-        index = 0
-        while index < len(rows)-1:
-            end_index = min(index + 5, len(rows)-1)
-            print("Rows {}-{}:".format(index+1, end_index))
-            for row in rows[index:end_index]:
-                print(row)
-            if end_index == len(rows)-1:
-                break
-            see_more = input(
-                "Enter 'more' to see 5 more results or enter "
-                "anything else to finish.\n").lower()
-            if see_more != "more":
-                break
-            else:
-                index = index + 5
-    else:
-        print("All rows:")
-        for row in rows:
-            print(row)
