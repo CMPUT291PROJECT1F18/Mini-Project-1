@@ -148,3 +148,6 @@ insert into requests values
         (8, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100),
         (9, 'jane_doe@abc.ca', '2018-04-26', 'cntr3', 'cntr2', 10);
 
+-- |email|msgTimestamp|sender|content|rno|seen|
+insert into inbox values
+        ('bob@123.ca', '2018-08-23', 'don@mayor.yeg', 'test message from your mayor!', 2, 'F')
