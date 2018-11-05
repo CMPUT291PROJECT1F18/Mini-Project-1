@@ -97,10 +97,17 @@ def test_register(mock_db):
 
 
 def test_delete_request(mock_db):
-    """"""
+    """Tests delete request"""
     database = sqlite3.connect(mock_db)
     shell = MiniProjectShell(database)
     shell.login("bob@123.ca", "foo")
+
+    assert database.cursor().execute("SELECT DISTINCT * FROM requests WHERE rid = 15").fetchone()
+    shell.do_delete_request('15')
+    assert not database.cursor().execute("SELECT DISTINCT * FROM requests WHERE rid = 15").fetchone()
+    assert database.cursor().execute("SELECT DISTINCT * FROM requests WHERE rid = 16").fetchone()
+    shell.do_delete_request('16')
+    assert not database.cursor().execute("SELECT DISTINCT * FROM requests WHERE rid = 16").fetchone()
 
 
 def test_search_requests_city(mock_db):

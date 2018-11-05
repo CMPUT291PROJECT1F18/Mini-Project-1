@@ -120,7 +120,6 @@ class MiniProjectShell(cmd.Cmd):
         """
         parser = get_show_inbox_parser()
         try:
-            parser.parse_args(arg.split())
             # view all messages within your inbox
             inbox_items = self.database.execute(
                 "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
