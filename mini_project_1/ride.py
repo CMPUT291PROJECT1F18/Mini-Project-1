@@ -39,6 +39,7 @@ def get_selection(items: list):
             elif selection == "exit":
                 return None
         elif index + 1 == len(items):
+            print("Press Enter to return to the start of the list\n")
             selection = str(input("Enter selection number: "))
 
             if selection.isnumeric():

@@ -152,15 +152,17 @@ class MiniProjectShell(cmd.Cmd):
                     "LEFT JOIN locations l3 on en.lcode = l3.lcode " + \
                     "WHERE l1.lcode = r.src AND l2.lcode = r.dst AND "+search_string+";"
 
-            print(query)
-            print(search_vars)
-            results = dbcursor.execute(query, search_vars)
+            dbcursor.execute(query, search_vars)
+            results = dbcursor.fetchall()
+
             # display matching
-            selection = get_selection(results)
+            if len(results):
+                selection = get_selection(results)
             # message the posting ride member
             if selection:
                 send_message(self.database, selection[7], self.login_session.get_email(),
                              "I want to book seats on this ride", selection[0])
+                print("Message sent to driver")
         except ShellArgumentException:
             __log__.error("invalid offer_ride argument")
 
