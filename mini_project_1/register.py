@@ -85,8 +85,6 @@ def get_parser() -> argparse.ArgumentParser:
     parser.description = \
         "register a new member to an existing mini-project-1 database"
     group = parser.add_argument_group(title='registration')
-    group.add_argument("-r", "--register", action="store_true",
-                       help="Enable registering a new user")
     group.add_argument("email", type=email,
                        help="A unique email to register and login with")
     group.add_argument("phone", type=phone,
