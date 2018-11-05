@@ -57,10 +57,12 @@ def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulu
             (rno, price, date, seats, luggage, source, destination, member.get_email()))
 
         if cno:
-            dbcursor.execute("UPDATE rides SET cno = ? WHERE rno = ?", (cno, rno))
+            dbcursor.execute("UPDATE rides SET cno = ? WHERE rno = ?",
+                             (cno, rno))
 
         for place in enroute:
-            dbcursor.execute("INSERT INTO enroute (rno, lcode) VALUES (?, ?)", (rno, place))
+            dbcursor.execute("INSERT INTO enroute (rno, lcode) VALUES (?, ?)",
+                             (rno, place))
     except sqlite3.OperationalError as e:
         print(e)
         return False
@@ -75,7 +77,8 @@ def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulu
 def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: LoginSession):
     """Returns whether a member has a car number cno in the database with
     cursor dbcursor"""
-    dbcursor.execute("SELECT cno FROM cars WHERE cno = ? AND owner = ?", (cno, member.get_email()))
+    dbcursor.execute("SELECT cno FROM cars WHERE cno = ? AND owner = ?",
+                     (cno, member.get_email()))
     if dbcursor.fetchall():
         return True
     return False
