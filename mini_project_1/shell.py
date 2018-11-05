@@ -158,8 +158,12 @@ class MiniProjectShell(cmd.Cmd):
         try:
             args = parser.parse_args(arg.split())
             try:
-                source = get_location_id(dbcursor, args.src, "Choose a source: ")
-                destination = get_location_id(dbcursor, args.dst, "Choose a destination: ")
+                source = \
+                    get_location_id(dbcursor, args.src,
+                                    "Choose a source: ")
+                destination = \
+                    get_location_id(dbcursor, args.dst,
+                                    "Choose a destination: ")
             except ValueNotFoundException as e:
                 print(e)
                 raise ShellArgumentException
@@ -233,8 +237,13 @@ class MiniProjectShell(cmd.Cmd):
                 selection = get_selection(results)
                 # message the posting ride member
                 if selection:
-                    send_message(self.database, selection[7], self.login_session.get_email(),
-                                 "I want to book seats on this ride", selection[0])
+                    send_message(
+                        self.database,
+                        selection[7],
+                        self.login_session.get_email(),
+                        "I want to book seats on this ride",
+                        selection[0]
+                    )
                     print("Message sent to driver")
             else:
                 print("No results")
@@ -371,7 +380,8 @@ class MiniProjectShell(cmd.Cmd):
             cur.execute(
                 "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);",
                 (to_delete[1], pendulum.now().to_datetime_string(),
-                 self.login_session.get_email(), "Your booking has been cancelled.",
+                 self.login_session.get_email(),
+                 "Your booking has been cancelled.",
                  to_delete[2], "n")
             )
             self.database.commit()
@@ -416,7 +426,8 @@ class MiniProjectShell(cmd.Cmd):
         else:
             __log__.info(
                 "successfully posted ride request: "
-                "rid: {} email: {} date: {} pickup: {} dropoff: {} price: {}".format(
+                "rid: {} email: {} date: {} pickup: {} dropoff: {} price: {}"
+                "".format(
                     rid, self.login_session.get_email(),
                     args.date.strftime(MINI_PROJECT_DATE_FMT),
                     args.pickup, args.dropoff, args.price
@@ -445,7 +456,7 @@ class MiniProjectShell(cmd.Cmd):
             for row in rows:
                 print(row)
         except ShellArgumentException:
-            __log__.exception("invalid list_requests arguement")
+            __log__.exception("invalid list_requests argument")
 
     @staticmethod
     def help_list_requests():
@@ -457,7 +468,6 @@ class MiniProjectShell(cmd.Cmd):
         """Search for a ride request by location number"""
         cur = self.database.cursor()
         parser = get_search_requests_lcode_parser()
-
         try:
             args = parser.parse_args(arg.split())
             cur.execute(
@@ -482,7 +492,6 @@ class MiniProjectShell(cmd.Cmd):
         """Search for a ride quest by city name"""
         cur = self.database.cursor()
         parser = get_search_requests_city_parser()
-
         try:
             args = parser.parse_args(arg.split())
             cur.execute(
@@ -508,7 +517,6 @@ class MiniProjectShell(cmd.Cmd):
         """Delete a ride request"""
         cur = self.database.cursor()
         parser = get_delete_request_parser()
-
         try:
             args = parser.parse_args(arg.split())
             cur.execute(
@@ -548,7 +556,6 @@ class MiniProjectShell(cmd.Cmd):
         """Select a ride request and perform actions"""
         cur = self.database.cursor()
         parser = get_select_request_parser()
-
         try:
             args = parser.parse_args(arg.split())
             cur.execute(
