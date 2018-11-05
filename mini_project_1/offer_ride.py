@@ -45,11 +45,12 @@ def get_offer_ride_parser() -> ShellArgumentParser:
     return parser
 
 
-def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulum.DateTime,
-               seats: int, price: int, luggage: str, source: str, destination: str,
-               cno: str = None, enroute: set = set()):
-    """
-    Tries to add a ride to the database for the member
+def offer_ride(database: sqlite3.Connection, member: LoginSession,
+               date: pendulum.DateTime, seats: int, price: int, luggage: str,
+               source: str, destination: str, cno: str = None,
+               enroute: set = set()) -> bool:
+    """Try to add a ride to the database for the member
+
     :return: if a ride has been added (True/False)
     """
     dbcursor = database.cursor()
@@ -90,8 +91,9 @@ def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulu
     return True
 
 
-def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int, member: LoginSession):
-    """Returns whether a member has a car number cno in the database with
+def check_valid_cno(dbcursor: sqlite3.Cursor, cno: int,
+                    member: LoginSession) -> bool:
+    """Return whether a member has a car number cno in the database with
     cursor dbcursor"""
     dbcursor.execute(
         "SELECT cno "

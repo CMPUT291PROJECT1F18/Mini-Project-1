@@ -70,7 +70,8 @@ def get_post_request_parser() -> ShellArgumentParser:
     return parser
 
 
-def valid_location_code(database: sqlite3.Connection, location_code_str: str):
+def valid_location_code(database: sqlite3.Connection,
+                        location_code_str: str) -> bool:
     """Validate that a location ode for use in ``post_ride_request``
     command actually exists in locations"""
 
