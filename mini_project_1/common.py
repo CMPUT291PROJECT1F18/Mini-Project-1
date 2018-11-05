@@ -93,7 +93,10 @@ def get_location_id(dbcursor: sqlite3.Cursor, keyword: str, prompt: str = None):
 
     # get exact match locde
     dbcursor.execute(
-        "SELECT * FROM locations WHERE lcode = ?", (keyword,))
+        "SELECT * "
+        "FROM locations WHERE lcode = ?",
+        (keyword,)
+    )
     location = dbcursor.fetchall()
     if location:
         return location[0][0]
@@ -101,8 +104,11 @@ def get_location_id(dbcursor: sqlite3.Cursor, keyword: str, prompt: str = None):
     # get matching locations, since it's not a lcode
     kw = '%' + keyword + '%'
     dbcursor.execute(
-        "SELECT * FROM locations WHERE city LIKE ? OR prov LIKE ? OR address LIKE ?",
-        (kw, kw, kw))
+        "SELECT * "
+        "FROM locations "
+        "WHERE city LIKE ? OR prov LIKE ? OR address LIKE ?",
+        (kw, kw, kw)
+    )
     locations = dbcursor.fetchall()
 
     # display and get user selection if more than one
@@ -119,11 +125,10 @@ def get_location_id(dbcursor: sqlite3.Cursor, keyword: str, prompt: str = None):
 def send_message(database: sqlite3.Connection, recipient: str, sender: str, content: str, rno: int):
     """"""
     cur = database.cursor()
-
-    send_query = "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);"
-    cur.execute(send_query,
-                (recipient, pendulum.now().to_datetime_string(),
-                 sender, content, rno, "n"))
+    cur.execute(
+        "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);",
+        (recipient, pendulum.now().to_datetime_string(), sender, content, rno, "n")
+    )
     database.commit()
 
 
@@ -131,7 +136,11 @@ def check_valid_lcode(database: sqlite3.Connection, lcode: str):
     """Checks whether a lcode is in the database"""
     dbcursor = database.cursor()
     dbcursor.execute(
-        "SELECT * FROM locations WHERE lcode = ?", (lcode,))
+        "SELECT * "
+        "FROM locations "
+        "WHERE lcode = ?",
+        (lcode,)
+    )
     if dbcursor.fetchall():
         return True
     return False
@@ -141,7 +150,11 @@ def check_valid_email(database: sqlite3.Connection, email: str):
     """Checks whether an email is in the database"""
     dbcursor = database.cursor()
     dbcursor.execute(
-        "SELECT * FROM members WHERE email = ?", (email,))
+        "SELECT * "
+        "FROM members "
+        "WHERE email = ?",
+        (email,)
+    )
     if dbcursor.fetchall():
         return True
     return False
