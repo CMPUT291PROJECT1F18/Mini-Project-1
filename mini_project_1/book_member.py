@@ -26,9 +26,10 @@ from mini_project_1.common import ShellArgumentParser, \
 
 
 def get_book_member_parser() -> ShellArgumentParser:
+    """Argparser for the :class:`.shell.MiniProjectShell`
+    ``book_member`` command"""
     parser = ShellArgumentParser(
         prog="book_member",
-        add_help=False,
         description="Book a member on a ride")
 
     parser.add_argument("email",

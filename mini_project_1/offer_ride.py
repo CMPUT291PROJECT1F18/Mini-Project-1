@@ -19,9 +19,10 @@ from mini_project_1.loginsession import LoginSession
 
 
 def get_offer_ride_parser() -> ShellArgumentParser:
+    """Argparser for the :class:`.shell.MiniProjectShell`
+    ``offer_ride`` command"""
     parser = ShellArgumentParser(
         prog="offer_ride",
-        add_help=False,
         description="Offer a ride")
 
     # date, seats, price, luggage, source, destination, cno, enroute
