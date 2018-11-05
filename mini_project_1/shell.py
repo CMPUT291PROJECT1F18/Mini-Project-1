@@ -17,6 +17,9 @@ from mini_project_1.loginsession import LoginSession
 __log__ = getLogger(__name__)
 
 
+MINI_PROJECT_DATE_FMT = "%Y-%m-%d"
+
+
 def logged_in(f):
     """Annotation to check if someone is logged in before attempting a
     command in the :class:`.MainProjectShell`"""
@@ -165,7 +168,7 @@ class MiniProjectShell(cmd.Cmd):
 
             print("Successfully deleted:\n{}".format(to_delete))
         except ShellArgumentException:
-            __log__.error("invalid cancel_booking argument")
+            __log__.exception("invalid cancel_booking argument")
 
     def help_cancel_booking(self):
         """Parser help message for cancelling a booking"""
@@ -185,13 +188,21 @@ class MiniProjectShell(cmd.Cmd):
                 max_rid = 0
             rid = 1 + int(max_rid)
 
+            # validate the given location codes
+            self.validate_location_code(args.pickup)
+            self.validate_location_code(args.dropoff)
+
             # create and insert the new ride request
             self.database.execute(
                 "INSERT INTO requests VALUES (?, ?, ?, ?, ?, ?)",
-                (rid, self.login_session.get_email(), args.date.strftime("%Y-%m-%d"), args.pickup, args.dropoff, args.price))
+                (rid, self.login_session.get_email(), args.date.strftime(MINI_PROJECT_DATE_FMT), args.pickup, args.dropoff, args.price))
             self.database.commit()
         except ShellArgumentException:
-            __log__.error("invalid post_ride_request argument")
+            __log__.exception("invalid post_ride_request argument")
+        else:
+            __log__.info("succesfully posted ride request: rid: {} email: {} date: {} pickup: {} dropoff: {} price: {}".format(
+                rid, self.login_session.get_email(), args.date.strftime(MINI_PROJECT_DATE_FMT), args.pickup, args.dropoff, args.price)
+            )
 
     def help_post_ride_request(self):
         """Post a ride request's parsers help message"""
@@ -225,7 +236,7 @@ class MiniProjectShell(cmd.Cmd):
             rows = cur.fetchall()
             print_5_and_prompt(rows)
         except ShellArgumentException:
-            __log__.error("invalid argument")
+            __log__.exception("invalid argument")
 
     def help_search_ride_requests_by_location_code(self):
         """Parser help message for searching ride requests by location code"""
@@ -248,7 +259,7 @@ class MiniProjectShell(cmd.Cmd):
             rows = cur.fetchall()
             print_5_and_prompt(rows)
         except ShellArgumentException:
-            __log__.error("invalid argument")
+            __log__.exception("invalid argument")
 
     def help_search_ride_requests_by_city_name(self):
         """Parser help message for searching ride requests by city name"""
@@ -288,7 +299,7 @@ class MiniProjectShell(cmd.Cmd):
 
             print("Successfully deleted:\n{}".format(to_delete))
         except ShellArgumentException:
-            __log__.error("invalid argument")
+            __log__.exception("invalid argument")
 
     def help_delete_ride_request(self):
         """Parser help message for deleting a ride request"""
@@ -329,6 +340,21 @@ class MiniProjectShell(cmd.Cmd):
             else:
                 __log__.warning("invalid login: bad username/password")
 
+    # TODO: this should be moved outside if possible
+    def validate_location_code(self, location_code_str: str):
+        """Validate that a location ode for use in ``post_ride_request`` command
+        actually exists in locations
+
+        :raises: :class:`ShellArgumentException` if the given location code
+                 is not within the ``locations`` table.
+        """
+
+        locations = self.database.execute("SELECT lcode "
+                                          "FROM locations "
+                                          "WHERE locations.lcode = ?", (location_code_str,)).fetchone()
+        if not locations:
+            raise ShellArgumentException("invalid location code: {}".format(location_code_str))
+
 
 class ShellArgumentException(Exception):
     def __init__(self, *args, **kwargs):
@@ -358,6 +384,8 @@ def print_5_and_prompt(rows):
 
 
 def price(price_string: str) -> int:
+    """Argparser type validation function for validating a price for use in
+    ``post_ride_request`` command"""
     price = int(price_string)
     if price < 0:
         raise argparse.ArgumentTypeError(
@@ -369,10 +397,22 @@ def price(price_string: str) -> int:
 
 
 def date(date_str: str) -> pendulum.DateTime:
-    return pendulum.parse(date_str)
+    """Argparser type validation function for validating a date for use
+    in ``post_ride_request`` command"""
+    date = pendulum.parse(date_str)
+    if date >= pendulum.today().subtract(days=1):
+        return date
+    else:
+        raise argparse.ArgumentTypeError(
+            "invalid date: {} (please choose a date from today {} forwards)".format(
+                date_str, pendulum.today().strftime(MINI_PROJECT_DATE_FMT)
+            )
+        )
 
 
 def get_post_ride_request_parser() -> ShellArgumentParser:
+    """Get a :class:`ShellArgumentParser` for use in parsing the arguments
+    for a ``post_ride_request`` command"""
     parser = ShellArgumentParser(
         add_help=False,
         description="Post a ride request")
@@ -380,15 +420,20 @@ def get_post_ride_request_parser() -> ShellArgumentParser:
     parser.add_argument("date", type=date,
                         help="Date the ride should start on")
     parser.add_argument("pickup",
-                        help="The location code for the pickup location of the ride")
+                        help="The location code for the pickup location of "
+                             "the ride")
     parser.add_argument("dropoff",
-                        help="The location code for the dropoff location of the ride")
+                        help="The location code for the dropoff location of "
+                             "the ride")
     parser.add_argument("price", type=price,
-                        help="The maximum amount you are willing to pay per seat for the ride")
+                        help="The maximum amount you are willing to pay per "
+                             "seat for the ride")
     return parser
 
 
 def get_cancel_booking_parser() -> ShellArgumentParser:
+    """Get a :class:`ShellArgumentParser` for use in parsing the arguments
+    for a ``cancel_booking`` command"""
     parser = ShellArgumentParser(
         add_help=False,
         description="Cancel a booking")
