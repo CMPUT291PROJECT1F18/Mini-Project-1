@@ -113,7 +113,8 @@ insert into rides values
         (40, 50, '2018-09-08', 1, 'Large Bag', 'cntr2', 'yyc1', 'don@mayor.yeg', 3),
         (41, 100, '2018-11-05', 2, 'Large Bag', 'cntr1', 'sk1', 'don@mayor.yeg', 3),
         (42, 150, '2018-11-05', 2, 'Large Bag', 'van2', 'nrth2', 'don@mayor.yeg', 3),
-        (43, 10, '2018-10-14', 4, 'Large Bag', 'sth4', 'yyc1', 'jane_doe@abc.ca', 1);
+        (43, 10, '2018-10-14', 4, 'Large Bag', 'sth4', 'yyc1', 'jane_doe@abc.ca', 1),
+        (44, 10, '2018-10-14', 4, 'Large Bag', 'sth4', 'yyc1', 'bob@123.ca', 1);
 
 -- |bno|email|rno|cost|seats|pickup|dropoff|
 insert into bookings values
@@ -128,7 +129,8 @@ insert into bookings values
         (9, 'cadence@rap.fm', 27, null, 1, null, null),
         (10, 'connor@oil.com', 5, 45, 1, null, null),
         (11, 'mal@serenity.ca', 41, null, 1, null, null),
-        (12, 'nellie@five.gov', 42, null, 1, null, null);
+        (12, 'nellie@five.gov', 42, null, 1, null, null),
+        (13, 'bob@123.ca', 44, null, 1, null, null);
 
 -- |rno|lcode|
 insert into enroute values
@@ -151,7 +153,11 @@ insert into requests values
         (11, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100),
         (12, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100),
         (13, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100),
-        (14, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100);
+        (14, 'mess@marky.mark', '2018-10-11', 'nrth2', 'sth3', 100),
+        (15, 'bob@123.ca', '2018-10-11', 'nrth2', 'sth3', 100),
+        (16, 'bob@123.ca', '2018-10-11', 'nrth2', 'sth3', 100),
+        (17, 'bob@123.ca', '2018-10-11', 'cntr1', 'ab1', 100),
+        (18, 'bob@123.ca', '2018-10-11', 'west1', 'cntr2', 100);
 
 -- |email|msgTimestamp|sender|content|rno|seen|
 insert into inbox values

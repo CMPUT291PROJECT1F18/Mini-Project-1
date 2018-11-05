@@ -70,6 +70,7 @@ class MiniProjectShell(cmd.Cmd):
         if self.register_start:
             self.do_register(None)
         self.do_login(None)
+        self.do_show_inbox(None)
         super().cmdloop()
 
     # ===============================
@@ -87,7 +88,6 @@ class MiniProjectShell(cmd.Cmd):
             self.login(username, password)
             if not self.login_session:
                 self.do_login(None)
-            self.do_show_inbox("")
 
     @logged_in
     def do_logout(self, arg):
@@ -121,7 +121,6 @@ class MiniProjectShell(cmd.Cmd):
         """
         parser = get_show_inbox_parser()
         try:
-            parser.parse_args(arg.split())
             # view all messages within your inbox
             inbox_items = self.database.execute(
                 "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
@@ -321,9 +320,11 @@ class MiniProjectShell(cmd.Cmd):
                 'WHERE bookings.rno = ?;',
                 (rno,)
             )
-            seats_taken = cur.fetchone()[0]
+            seats_taken = cur.fetchone()
             if not seats_taken:
                 seats_taken = 0
+            else:
+                seats_taken = seats_taken[0]
 
             # book seats if available or user accepts overbooking
             if seats_available < seats_taken + args.seats:
@@ -360,7 +361,7 @@ class MiniProjectShell(cmd.Cmd):
             )
             to_delete = cur.fetchone()
 
-            if len(to_delete) == 0:
+            if not to_delete:
                 print("You don't have a booking where bno={}".format(args.bno))
                 print("Your bookings:")
                 self.do_list_bookings("")
@@ -480,8 +481,8 @@ class MiniProjectShell(cmd.Cmd):
             cur.execute(
                 'SELECT DISTINCT requests.* '
                 'FROM requests '
-                'WHERE pickup = ?',
-                (args.lcode.lower(),)
+                'WHERE pickup like ?',
+                (args.lcode,)
             )
             rows = cur.fetchall()
             print_5_and_prompt(rows)
@@ -505,7 +506,7 @@ class MiniProjectShell(cmd.Cmd):
                 'SELECT DISTINCT requests.* '
                 'FROM requests, locations '
                 'WHERE requests.pickup = locations.lcode '
-                'AND locations.city = ?',
+                'AND locations.city LIKE ?',
                 (args.city.lower(),)
             )
             rows = cur.fetchall()
@@ -559,7 +560,7 @@ class MiniProjectShell(cmd.Cmd):
         get_delete_request_parser().print_help()
 
     @logged_in
-    def do_select_request(self, arg):
+    def do_select_request(self, arg):  # TODO make testable
         """Select a ride request and perform actions"""
         cur = self.database.cursor()
         parser = get_select_request_parser()
