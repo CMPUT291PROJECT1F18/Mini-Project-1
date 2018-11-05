@@ -27,7 +27,6 @@ def get_book_member_parser() -> ShellArgumentParser:
         add_help=False,
         description="Book a member on a ride")
 
-    # date, seats, price, luggage, source, destination, cno, enroute
     parser.add_argument("email",
                         help="Email of the member who will be booked on the ride")
     parser.add_argument("seats", type=greater_than_zero_number,
