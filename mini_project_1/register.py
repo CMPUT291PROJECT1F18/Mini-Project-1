@@ -96,7 +96,7 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv=sys.argv[1:]):
+def main(argv=sys.argv[1:]) -> int:
     """entry point for registering members to an existing mini-project-1
     database"""
     parser = get_parser()
