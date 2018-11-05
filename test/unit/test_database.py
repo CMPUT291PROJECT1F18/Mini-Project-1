@@ -9,7 +9,8 @@ import pytest
 from mock import mock
 
 import mini_project_1
-from mini_project_1 import book_member
+from mini_project_1.book_member import book_member
+from mini_project_1.common import send_message
 from mini_project_1.loginsession import LoginSession
 from mini_project_1.offer_ride import offer_ride
 from mini_project_1.shell import MiniProjectShell
@@ -149,15 +150,17 @@ def test_cancel_booking(mock_db):
                                          "WHERE bno = 13").fetchone()
 
 
-def test_book_member(mock_db): # TODO
+def test_book_member(mock_db):
     database = sqlite3.connect(mock_db)
     shell = MiniProjectShell(database)
     shell.login("bob@123.ca", "foo")
-    # assert database.cursor().execute("SELECT DISTINCT * FROM bookings "
-    #                                  "WHERE bno = 13").fetchone()
-    # book_member(database, rno, args.email, args.seats, args.price, args.pickup, args.dropoff))
-    # assert not database.cursor().execute("SELECT DISTINCT * FROM bookings "
-    #                                      "WHERE bno = 13").fetchone()
+    assert not database.cursor().execute("SELECT DISTINCT * FROM bookings "
+                                         "WHERE email like 'jane_doe@abc.ca'").fetchone()
+
+    book_member(database, 44, 'jane_doe@abc.ca', 12000, 1, 'west1', 'yyc1')
+
+    assert database.cursor().execute("SELECT DISTINCT * FROM bookings "
+                                     "WHERE email like 'jane_doe@abc.ca'").fetchone()
 
 
 # def test_list_bookings(mock_db): TODO
@@ -182,7 +185,18 @@ def test_offer_ride(mock_db):
     offer_ride(database, user, "2018-12-31", 3, 3000, "I love em", 'west1', 'ab1', 1, {'cntr1', 'cntr2', 'cntr3'})
     assert database.cursor().execute("SELECT DISTINCT * FROM rides "
                                      "WHERE rno > 43 AND driver LIKE 'jane_doe@abc.ca'").fetchone()
-    # TODO test message
+
+
+def test_send_message(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+
+    assert not database.cursor().execute("SELECT * FROM inbox "
+                                         "WHERE email LIKE 'jane_doe@abc.ca'").fetchall()
+    send_message(database, 'jane_doe@abc.ca', 'bob@123.ca', 'I love you', 42)
+
+    assert database.cursor().execute("SELECT * FROM inbox "
+                                     "WHERE email LIKE 'jane_doe@abc.ca'").fetchall()
 
 
 def test_show_inbox(mock_db):
