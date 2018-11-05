@@ -97,7 +97,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid logout arguement")
 
-    def help_logout(self):
+    @staticmethod
+    def help_logout():
         """Print the argparser help message for logout"""
         get_logout_parser().print_help()
 
@@ -144,7 +145,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid show_inbox argument")
 
-    def help_show_inbox(self):
+    @staticmethod
+    def help_show_inbox():
         """Print the argparser help message for show_inbox"""
         get_show_inbox_parser().print_help()
 
@@ -180,7 +182,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid offer_ride argument")
 
-    def help_offer_ride(self):
+    @staticmethod
+    def help_offer_ride():
         """Print the argparser help message for offer_ride"""
         get_offer_ride_parser().print_help()
 
@@ -238,7 +241,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid search_rides argument")
 
-    def help_search_rides(self):
+    @staticmethod
+    def help_search_rides():
         """Print the argparser help message for search_rides"""
         get_search_for_ride_parser().print_help()
 
@@ -262,7 +266,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid list_bookings argument")
 
-    def help_list_bookings(self):
+    @staticmethod
+    def help_list_bookings():
         """Print the argparser help message for list_bookings"""
         get_list_bookings_parser().print_help()
 
@@ -321,7 +326,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid book_member argument")
 
-    def help_book_member(self):
+    @staticmethod
+    def help_book_member():
         """Print the argparser help message for book_member"""
         get_search_for_ride_parser().print_help()
 
@@ -374,7 +380,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid cancel_booking argument")
 
-    def help_cancel_booking(self):
+    @staticmethod
+    def help_cancel_booking():
         """Print the argparser help message for cancel_booking"""
         get_cancel_booking_parser().print_help()
 
@@ -416,7 +423,8 @@ class MiniProjectShell(cmd.Cmd):
                 )
             )
 
-    def help_post_request(self):
+    @staticmethod
+    def help_post_request():
         """Print the argparser help message for post_request"""
         get_post_request_parser().print_help()
 
@@ -487,7 +495,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid argument")
 
-    def help_search_requests_city(self):
+    @staticmethod
+    def help_search_requests_city():
         """Print the argparser help message for searching ride requests
         by city name"""
         get_search_requests_city_parser().print_help()
@@ -527,7 +536,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid argument")
 
-    def help_delete_request(self):
+    @staticmethod
+    def help_delete_request():
         """Print the argparser help message for deleting a ride request"""
         get_delete_request_parser().print_help()
 
@@ -577,7 +587,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid argument")
 
-    def help_select_request(self):
+    @staticmethod
+    def help_select_request():
         """Print the argparser help message for selecting a ride request"""
         get_select_request_parser().print_help()
 
