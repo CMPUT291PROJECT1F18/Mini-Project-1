@@ -10,9 +10,11 @@ from logging import getLogger
 
 import pendulum
 
+from mini_project_1.book_member import get_book_member_parser, book_member
 from mini_project_1.cancel_booking import get_cancel_booking_parser
 from mini_project_1.common import ShellArgumentException, \
-    MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, get_selection, send_message
+    MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, get_selection, send_message, check_valid_email, \
+    check_valid_lcode
 from mini_project_1.delete_ride_request import get_delete_ride_request_parser
 from mini_project_1.loginsession import LoginSession
 from mini_project_1.offer_ride import get_offer_ride_parser, check_valid_cno, offer_ride
@@ -145,12 +147,10 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid offer_ride argument")
 
-
     def help_offer_ride(self):
         """Parser help message for offering a ride"""
         parser = get_offer_ride_parser()
         parser.print_help()
-
 
     @logged_in
     def do_search_rides(self, arg):
@@ -204,10 +204,10 @@ class MiniProjectShell(cmd.Cmd):
             else:
                 print("No results")
         except ShellArgumentException:
-            __log__.error("invalid offer_ride argument")
+            __log__.error("invalid search_rides argument")
 
     def help_search_rides(self):
-        """Parser help message for offering a ride"""
+        """Parser help message for searching rides"""
         parser = get_search_for_ride_parser()
         parser.print_help()
 
@@ -223,13 +223,69 @@ class MiniProjectShell(cmd.Cmd):
             (self.login_session.get_email(),)
         )
         rows = cur.fetchall()
-        for row in rows:
+        for row in rows:  # TODO: list max of five (get_selection(rows, ""))
             print(row)
 
     @logged_in
     def do_book_member(self, arg):
         """Book other members on a ride"""
-        # TODO:
+        cur = self.database.cursor()
+        parser = get_book_member_parser()
+
+        try:
+            args = parser.parse_args(arg.split())
+            # ensure valid inputs
+            if not check_valid_lcode(self.database, args.pickup):
+                print("Pickup locde not valid")
+                raise ShellArgumentException
+            if not check_valid_lcode(self.database, args.dropoff):
+                print("Dropoff locde not valid")
+                raise ShellArgumentException
+            if not check_valid_email(self.database, args.email):
+                print("Email not valid")
+                raise ShellArgumentException
+
+            # list my rides
+            cur = self.database.cursor()
+            cur.execute(
+                'SELECT * '
+                'FROM rides '
+                'WHERE rides.driver = ?;',
+                (self.login_session.get_email(),)
+            )
+            rows = cur.fetchall()
+            ride = get_selection(rows, "Enter the row number for the ride: ")
+            rno = ride[0]
+            seats_available = ride[3]
+
+            # check how many seats booked
+            cur.execute(
+                'SELECT sum(seats) '
+                'FROM bookings '
+                'WHERE bookings.rno = ?;',
+                (rno,)
+            )
+            seats_taken = cur.fetchone()[0]
+            if not seats_taken:
+                seats_taken = 0
+
+            # book seats if available or user accepts overbooking
+            if seats_available < seats_taken + args.seats:
+                if str(input("Warning: ride will be overbooked. Continue: [y] or [n]") == 'y'):
+                    book_member(self.database, rno, args.email, args.seats, args.price, args.pickup, args.dropoff)
+                    send_message(self.database, args.email, self.login_session.get_email(),
+                                 "I have booked you on a ride", rno)
+            else:
+                book_member(self.database, rno, args.email, args.seats, args.price, args.pickup, args.dropoff)
+                send_message(self.database, args.email, self.login_session.get_email(),
+                             "I have booked you on a ride", rno)
+        except ShellArgumentException:
+            __log__.exception("invalid cancel_booking argument")
+
+    def help_book_member(self):
+        """Parser help message for booking a member"""
+        parser = get_search_for_ride_parser()
+        parser.print_help()
 
     @logged_in
     def do_cancel_booking(self, arg):
@@ -248,13 +304,11 @@ class MiniProjectShell(cmd.Cmd):
             )
             to_delete = cur.fetchone()
 
-
             if len(to_delete) == 0:
                 print("You don't have a booking where bno={}".format(args.bno))
                 print("Your bookings:")
                 self.do_list_bookings(self)
                 return
-
 
             cur.execute(
                 "DELETE FROM bookings "
@@ -267,7 +321,7 @@ class MiniProjectShell(cmd.Cmd):
                 "AND b2.rno = rides.rno)",
                 (args.bno, self.login_session.get_email(),)
             )
-            
+
             self.database.commit()
             print("Successfully deleted:\n{}".format(to_delete))
 
@@ -345,7 +399,7 @@ class MiniProjectShell(cmd.Cmd):
             (self.login_session.get_email().lower(),)
         )
         rows = cur.fetchall()
-        for row in rows:
+        for row in rows: # TODO: list max of five (get_selection(rows, ""))
             print(row)
 
     @logged_in
@@ -436,12 +490,12 @@ class MiniProjectShell(cmd.Cmd):
         """Parser help message for deleting a ride request"""
         parser = get_delete_ride_request_parser()
         parser.print_help()
-        
+
     def do_select_ride_request(self, arg):
         """Select a ride request and perform actions"""
         cur = self.database.cursor()
         parser = get_select_ride_request_parser()
-        
+
         try:
             args = parser.parse_args(arg.split())
             cur.execute(
@@ -472,7 +526,7 @@ class MiniProjectShell(cmd.Cmd):
                          pendulum.now().to_datetime_string(),
                          self.login_session.get_email(),
                          message,
-                         0,  # TODO: What to put here?
+                         0,  # TODO: What to put here? - A none value.
                          "n")
                     )
                     self.database.commit()
@@ -526,7 +580,7 @@ class MiniProjectShell(cmd.Cmd):
             else:
                 __log__.warning("invalid login: bad username/password")
 
-    # TODO: this should be moved outside if possible
+    # TODO: this should be moved outside if possible - see check_valid_lcode in common
     def validate_location_code(self, location_code_str: str):
         """Validate that a location ode for use in ``post_ride_request``
         command actually exists in locations
