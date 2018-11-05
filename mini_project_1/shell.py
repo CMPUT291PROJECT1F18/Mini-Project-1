@@ -499,7 +499,7 @@ class MiniProjectShell(cmd.Cmd):
         parser.print_help()
 
     @logged_in
-    def do_select_request(self, arg):
+    def do_select_request(self, arg):  # TODO make testable
         """Select a ride request and perform actions"""
         cur = self.database.cursor()
         parser = get_select_request_parser()

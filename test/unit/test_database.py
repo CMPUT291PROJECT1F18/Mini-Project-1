@@ -6,10 +6,13 @@
 import os
 import sqlite3
 import pytest
+from mock import mock
+
 import mini_project_1
 from mini_project_1.shell import MiniProjectShell
 from mini_project_1.register import valid_email, valid_password, valid_name, \
-    valid_phone
+    valid_phone, register_member
+from unittest import TestCase
 
 DATABASE_DIR = os.path.join(
     os.path.dirname(os.path.realpath(mini_project_1.__file__)),
@@ -74,14 +77,23 @@ def test_logout(mock_db):
 def test_register(mock_db):
     """"""
     database = sqlite3.connect(mock_db)
+    dbcursor = database.cursor()
     shell = MiniProjectShell(database)
+    testcases = list()
+
+    prev_all_members = dbcursor.execute("Select * from members").fetchall()
+
+    register_member(database, "bob@456.ca", "Jonny Boi", '213-342-2834', 'pass')
+    register_member(database, "vali@mail.com", "Jonny Boi", '213-342-2834', 'pass')
+    register_member(database, "val@mail.com", "Jonny Boi", '213-342-2834', 'pass')
+
+    all_members = dbcursor.execute("Select * from members").fetchall()
+    assert len(prev_all_members) + 3 == len(all_members)
 
 
-def test_select_request(mock_db):
-    """"""
-    database = sqlite3.connect(mock_db)
-    shell = MiniProjectShell(database)
-    shell.login("bob@123.ca", "foo")
+# def test_select_request(mock_db): TODO
+#     """"""
+#     pass
 
 
 def test_delete_request(mock_db):

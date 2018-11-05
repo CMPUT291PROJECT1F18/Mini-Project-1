@@ -94,7 +94,7 @@ def get_location_id(dbcursor: sqlite3.Cursor, keyword: str, prompt: str = None):
     # get exact match locde
     dbcursor.execute(
         "SELECT * "
-        "FROM locations WHERE lcode = ?",
+        "FROM locations WHERE lcode LIKE ?",
         (keyword,)
     )
     location = dbcursor.fetchall()
@@ -138,7 +138,7 @@ def check_valid_lcode(database: sqlite3.Connection, lcode: str):
     dbcursor.execute(
         "SELECT * "
         "FROM locations "
-        "WHERE lcode = ?",
+        "WHERE lcode LIKE ?",
         (lcode,)
     )
     if dbcursor.fetchall():
