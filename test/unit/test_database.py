@@ -164,4 +164,4 @@ def test_valid_location_code_valid(mock_db):
 
 def test_valid_location_code_invalid(mock_db):
     database = sqlite3.connect(mock_db)
-    assert not valid_location_code(database, "INVALID_LOCAITON_CODE")
+    assert not valid_location_code(database, "INVALID_LOCATION_CODE")
