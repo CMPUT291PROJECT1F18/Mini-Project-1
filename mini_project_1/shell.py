@@ -84,7 +84,7 @@ class MiniProjectShell(cmd.Cmd):
             username = str(input("username: "))
             password = getpass("password: ")
             self.login(username, password)
-            while not self.login_session:
+            if not self.login_session:
                 self.do_login(None)
             self.do_show_inbox("")
 
@@ -113,7 +113,8 @@ class MiniProjectShell(cmd.Cmd):
 
     @logged_in
     def do_show_inbox(self, arg):
-        """View all inbox messages related to the currently logged in email
+        """View all unseen (seen="n") inbox messages related to the
+        currently logged in email
 
         Set all viewed messages as seen="y"
         """
@@ -567,6 +568,10 @@ class MiniProjectShell(cmd.Cmd):
             )
             selected = cur.fetchone()
 
+            if selected is None:
+                print("There is no ride request with rid={}".format(args.rid))
+                return
+
             print("You have selected: {}".format(selected))
             while True:
                 response = \
@@ -587,10 +592,11 @@ class MiniProjectShell(cmd.Cmd):
                          pendulum.now().to_datetime_string(),
                          self.login_session.get_email(),
                          message,
-                         0,  # TODO: What to put here? - A none value.
+                         None,
                          "n")
                     )
                     self.database.commit()
+                    print("Successfully sent message to {}".format(poster))
                     break
                 elif response == "n":
                     break

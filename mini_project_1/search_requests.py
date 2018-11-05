@@ -42,11 +42,11 @@ def print_5_and_prompt(rows):
     if len(rows) > 5:
         index = 0
         while index < len(rows)-1:
-            end_index = min(index + 5, len(rows)-1)
+            end_index = min(index + 5, len(rows))
             print("Rows {}-{}:".format(index+1, end_index))
             for row in rows[index:end_index]:
                 print(row)
-            if end_index == len(rows)-1:
+            if end_index == len(rows):
                 break
             see_more = input(
                 "Enter 'more' to see 5 more results or enter "
