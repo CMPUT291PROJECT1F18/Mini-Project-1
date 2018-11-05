@@ -16,6 +16,7 @@ from mini_project_1.common import ShellArgumentParser
 
 def get_search_requests_lcode_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
+        prog="search_requests_lcode",
         add_help=False,
         description="Search ride requests by location code")
 
@@ -26,6 +27,7 @@ def get_search_requests_lcode_parser() -> ShellArgumentParser:
 
 def get_search_requests_city_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
+        prog="search_requests_city",
         add_help=False,
         description="Search ride requests by city name")
 

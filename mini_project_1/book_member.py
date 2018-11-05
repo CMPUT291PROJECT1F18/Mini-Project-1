@@ -27,6 +27,7 @@ from mini_project_1.common import ShellArgumentParser, \
 
 def get_book_member_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
+        prog="book_member",
         add_help=False,
         description="Book a member on a ride")
 

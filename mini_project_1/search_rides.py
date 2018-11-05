@@ -20,6 +20,7 @@ from mini_project_1.common import ShellArgumentParser
 
 def get_search_for_ride_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
+        prog="search_rides",
         add_help=False,
         description="Search for a ride and if one is selected sent a message "
                     "of intent to join")

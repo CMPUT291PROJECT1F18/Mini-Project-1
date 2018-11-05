@@ -13,6 +13,7 @@ from mini_project_1.common import ShellArgumentParser
 
 def get_show_inbox_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
+        prog="show_inbox",
         add_help=False,
         description="List all the unseen messages in your inbox")
 

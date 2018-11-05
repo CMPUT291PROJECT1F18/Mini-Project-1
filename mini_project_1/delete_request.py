@@ -11,6 +11,7 @@ from mini_project_1.common import ShellArgumentParser
 
 def get_delete_request_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
+        prog="delete_request",
         add_help=False,
         description="Delete a ride request by rid")
 
