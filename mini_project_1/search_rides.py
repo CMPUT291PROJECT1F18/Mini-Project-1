@@ -14,6 +14,7 @@ matches, at most 5 will be shown at a time, and the member is provided an
 option to see more. The member should be able to select a ride and message
 the member posting the ride that h/she wants to book seats on that ride.
 """
+
 from mini_project_1.common import ShellArgumentParser
 
 
