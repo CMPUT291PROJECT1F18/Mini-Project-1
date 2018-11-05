@@ -63,6 +63,7 @@ class MiniProjectShell(cmd.Cmd):
             self.login(username, password)
             while not self.login_session:
                 self.do_login(None)
+            self.do_show_inbox(None)
 
     @logged_in
     def do_logout(self, arg):
@@ -76,6 +77,29 @@ class MiniProjectShell(cmd.Cmd):
         __log__.info("exiting mini-project-1 shell")
         self.database.close()
         return True
+
+    @logged_in
+    def do_show_inbox(self, arg):
+        """View your inbox and all messages contained
+
+        Set all viewed messages as seen="T"
+        """
+        # view all messages within your inbox
+        inbox_items = self.database.execute(
+            "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
+            "FROM inbox "
+            "WHERE inbox.email = ?",
+            (self.login_session.get_email(),)).fetchall()
+        for inbox_item in inbox_items:
+            print(inbox_item)
+
+        # set all messages within your inbox as seen="T"
+        self.database.execute(
+            "UPDATE inbox "
+            "SET seen='T' " 
+            "WHERE inbox.email = ?",
+            (self.login_session.get_email(),))
+        self.database.commit()
 
     @logged_in
     def do_offer_ride(self, arg):
