@@ -32,7 +32,8 @@ def get_book_member_parser() -> ShellArgumentParser:
         description="Book a member on a ride")
 
     parser.add_argument("email",
-                        help="Email of the member who will be booked on the ride")
+                        help="Email of the member who will be booked on "
+                             "the ride")
     parser.add_argument("seats", type=greater_than_zero_number,
                         help="The number of seats booked")
     parser.add_argument("price", type=price,
