@@ -5,6 +5,7 @@ MiniProjectShell Command Line Use
 Below is usage documentation on using the mini-project-1 shell and
 the various commands associated with it.
 
+
 book_member
 ===========
 
@@ -147,6 +148,3 @@ Logout (if needed) and exit out of the mini-project-1 shell.
 .. code-block:: bash
 
     usage: exit
-
-
-
