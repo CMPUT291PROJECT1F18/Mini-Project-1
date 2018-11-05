@@ -44,7 +44,7 @@ def date(date_str: str) -> pendulum.DateTime:
         )
 
 
-def get_post_ride_request_parser() -> ShellArgumentParser:
+def get_post_request_parser() -> ShellArgumentParser:
     """Get a :class:`ShellArgumentParser` for use in parsing the arguments
     for a ``post_ride_request`` command"""
     parser = ShellArgumentParser(

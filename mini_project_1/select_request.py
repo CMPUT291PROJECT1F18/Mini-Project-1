@@ -1,18 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""Delete a ride request
-
-The member should be able to delete any of his/her ride requests.
-"""
+"""Select a ride request"""
 
 from mini_project_1.common import ShellArgumentParser
 
 
-def get_delete_ride_request_parser() -> ShellArgumentParser:
+def get_select_request_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
-        description="Delete a ride request by rid")
+        description="Select a ride request and perform actions with it"
+    )
 
     parser.add_argument("rid", type=int,
                         help="The ID of the ride request to delete")
