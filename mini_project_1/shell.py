@@ -28,6 +28,7 @@ from mini_project_1.search_requests import \
     get_search_requests_lcode_parser, print_5_and_prompt
 from mini_project_1.search_rides import get_search_for_ride_parser
 from mini_project_1.select_request import get_select_request_parser
+from mini_project_1.show_inbox import get_show_inbox_parser
 
 __log__ = getLogger(__name__)
 
@@ -83,7 +84,7 @@ class MiniProjectShell(cmd.Cmd):
             self.login(username, password)
             while not self.login_session:
                 self.do_login(None)
-            self.do_show_inbox(None)
+            self.do_show_inbox("")
 
     @logged_in
     def do_logout(self, arg):
@@ -104,29 +105,38 @@ class MiniProjectShell(cmd.Cmd):
 
         Set all viewed messages as seen="y"
         """
-        # view all messages within your inbox
-        inbox_items = self.database.execute(
-            "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
-            "FROM inbox "
-            "WHERE inbox.email = ? AND inbox.seen = 'n'",
-            (self.login_session.get_email(),)
-        ).fetchall()
-
-        if inbox_items:
-            print("Your inbox:")
-            for inbox_item in inbox_items:
-                print(inbox_item)
-
-            # set all messages within your inbox as seen="y"
-            self.database.execute(
-                "UPDATE inbox "
-                "SET seen='y' " 
-                "WHERE inbox.email = ?",
+        parser = get_show_inbox_parser()
+        try:
+            parser.parse_args(arg.split())
+            # view all messages within your inbox
+            inbox_items = self.database.execute(
+                "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
+                "FROM inbox "
+                "WHERE inbox.email = ? AND inbox.seen = 'n'",
                 (self.login_session.get_email(),)
-            )
-            self.database.commit()
-        else:
-            print("No new messages")
+            ).fetchall()
+
+            if inbox_items:
+                print("Your inbox:")
+                for inbox_item in inbox_items:
+                    print(inbox_item)
+
+                # set all messages within your inbox as seen="y"
+                self.database.execute(
+                    "UPDATE inbox "
+                    "SET seen='y' " 
+                    "WHERE inbox.email = ?",
+                    (self.login_session.get_email(),)
+                )
+                self.database.commit()
+            else:
+                print("No new messages")
+        except ShellArgumentException:
+            __log__.exception("invalid show_inbox argument")
+
+    def help_show_inbox(self):
+        """Parser help message for show_inbox"""
+        get_show_inbox_parser().print_help()
 
     @logged_in
     def do_offer_ride(self, arg):
