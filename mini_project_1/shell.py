@@ -98,11 +98,12 @@ class MiniProjectShell(cmd.Cmd):
 
     @logged_in
     def do_show_inbox(self, arg):
-        """View all inbox messages related to the currently logged in email
+        """View all unseen (seen="n") inbox messages related to the
+        currently logged in email
 
         Set all viewed messages as seen="y"
         """
-        # view all messages within your inbox
+        # view all unseen messages within your inbox
         inbox_items = self.database.execute(
             "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
             "FROM inbox "
