@@ -476,7 +476,7 @@ class MiniProjectShell(cmd.Cmd):
                 'SELECT DISTINCT requests.* '
                 'FROM requests '
                 'WHERE pickup = ?',
-                (args.lcode,)
+                (args.lcode.lower(),)
             )
             rows = cur.fetchall()
             print_5_and_prompt(rows)
