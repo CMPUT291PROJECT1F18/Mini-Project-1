@@ -54,7 +54,9 @@ Break-down of the work: TODO: fill our contri
 
   * rfurrer - Ryan Furrer
 	Hours: 15ish hours
-	Progress made: main contributions were the book a member, offer ride and search rides functionality
+	Progress made:
+	    main contributions were the book a member, offer ride and search rides functionality
+	    also did some bug fixing
 
   * tlorincz- Thomas Lorincz
 	Hours:
