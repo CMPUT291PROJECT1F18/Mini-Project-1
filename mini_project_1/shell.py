@@ -24,7 +24,8 @@ from mini_project_1.register import valid_password, \
     register_member, valid_name, valid_phone, valid_email
 from mini_project_1.offer_ride import get_offer_ride_parser, \
     check_valid_cno, offer_ride
-from mini_project_1.post_request import get_post_request_parser
+from mini_project_1.post_request import get_post_request_parser, \
+    valid_location_code
 from mini_project_1.search_requests import \
     get_search_requests_city_parser, \
     get_search_requests_lcode_parser, print_5_and_prompt
@@ -412,8 +413,12 @@ class MiniProjectShell(cmd.Cmd):
             rid = 1 + int(max_rid)
 
             # validate the given location codes
-            self.validate_location_code(args.pickup)
-            self.validate_location_code(args.dropoff)
+            if not valid_location_code(self.database, args.pickup):
+                raise ShellArgumentException(
+                    "invalid location code: {}".format(args.pickup))
+            if not valid_location_code(self.database, args.dropoff):
+                raise ShellArgumentException(
+                    "invalid location code: {}".format(args.dropoff))
 
             # create and insert the new ride request
             self.database.execute(
@@ -685,23 +690,4 @@ class MiniProjectShell(cmd.Cmd):
                 __log__.info("logged in user: {}".format(user_hit[0]))
             else:
                 __log__.warning("invalid login: bad username/password")
-
-    # TODO: this should be moved outside if possible - see check_valid_lcode in common
-    def validate_location_code(self, location_code_str: str):
-        """Validate that a location ode for use in ``post_ride_request``
-        command actually exists in locations
-
-        :raises: :class:`ShellArgumentException` if the given location code
-                 is not within the ``locations`` table.
-        """
-
-        locations = self.database.execute(
-            "SELECT lcode "
-            "FROM locations "
-            "WHERE locations.lcode = ?",
-            (location_code_str,)
-        ).fetchone()
-        if not locations:
-            raise ShellArgumentException(
-                "invalid location code: {}".format(location_code_str))
 

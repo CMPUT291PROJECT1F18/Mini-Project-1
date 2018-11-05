@@ -11,10 +11,16 @@ the member.
 """
 
 import argparse
+import sqlite3
+from logging import getLogger
 
 import pendulum
 
-from mini_project_1.common import ShellArgumentParser, MINI_PROJECT_DATE_FMT
+from mini_project_1.common import ShellArgumentParser, MINI_PROJECT_DATE_FMT, \
+    ShellArgumentException
+
+
+__log__ = getLogger(__name__)
 
 
 def price(price_string: str) -> int:
@@ -64,3 +70,24 @@ def get_post_request_parser() -> ShellArgumentParser:
                         help="The maximum amount you are willing to pay per "
                              "seat for the ride")
     return parser
+
+
+def valid_location_code(database: sqlite3.Connection, location_code_str: str):
+    """Validate that a location ode for use in ``post_ride_request``
+    command actually exists in locations
+
+    :raises: :class:`ShellArgumentException` if the given location code
+             is not within the ``locations`` table.
+    """
+
+    locations = database.execute(
+        "SELECT lcode "
+        "FROM locations "
+        "WHERE locations.lcode = ?",
+        (location_code_str,)
+    ).fetchone()
+    if not locations:
+        __log__.error("invalid location code: {}".format(location_code_str))
+        return False
+    else:
+        return True
