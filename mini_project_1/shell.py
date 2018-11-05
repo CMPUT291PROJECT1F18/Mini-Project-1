@@ -347,7 +347,7 @@ class MiniProjectShell(cmd.Cmd):
 
         locations = self.database.execute("SELECT lcode "
                                           "FROM locations "
-                                          "WHERE locations.lcode = ?", (location_code_str,))
+                                          "WHERE locations.lcode = ?", (location_code_str,)).fetchone()
         if not locations:
             raise ShellArgumentException("invalid location code: {}".format(location_code_str))
 
