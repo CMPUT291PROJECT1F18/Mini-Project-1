@@ -1,15 +1,13 @@
-import sqlite3
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-from mini_project_1.common import ShellArgumentParser, greater_than_zero_number, price
-
-"""
-Book members
+"""Book members
 
 The member should be able to book other members on the rides they offer. 
 
-The member should be able to select a ride and book a member for that ride by entering the 
-member email, the number of seats booked, the cost per seat, and pickup and 
-drop off location codes. 
+The member should be able to select a ride and book a member for that ride
+by entering the member email, the number of seats booked, the cost per seat,
+and pickup and drop off location codes.
 
 Your system should assign a unique booking number (bno) to the booking. 
 
@@ -17,9 +15,14 @@ Your system should give a warning if a ride is being
 overbooked (i.e. the number of seats booked exceeds the number of seats 
 offered), but will allow overbooking if the member confirms it. 
 
-After a successful booking, a proper message should be sent to the other member that 
-s/he is booked on the ride. 
+After a successful booking, a proper message should be sent to the other
+member that s/he is booked on the ride.
 """
+
+import sqlite3
+
+from mini_project_1.common import ShellArgumentParser, \
+    greater_than_zero_number, price
 
 
 def get_book_member_parser() -> ShellArgumentParser:
