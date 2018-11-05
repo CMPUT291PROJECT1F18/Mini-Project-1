@@ -27,7 +27,7 @@ def unique_email(database: sqlite3.Connection, email: str) -> bool:
 
 
 def valid_password(password_str: str) -> bool:
-    """Argparse type validator for a member's password"""
+    """Validator for a member's password"""
     if len(password_str) < 1 or 6 < len(password_str):
         __log__.error(
             "invalid password length: choose between 1 to 6 characters")
@@ -37,7 +37,7 @@ def valid_password(password_str: str) -> bool:
 
 
 def valid_phone(phone_str: str) -> Union[bool, str]:
-    """Argparse type validator for a member's phone number"""
+    """Validator for a member's phone number"""
     m = re.search("^(\d{3})?(?: ?|-?)(\d{3})(?: ?|-?)(\d{4})$", phone_str)
     try:
         return "{}-{}-{}".format(m.group(1), m.group(2), m.group(3))
@@ -48,7 +48,7 @@ def valid_phone(phone_str: str) -> Union[bool, str]:
 
 def valid_email(database: sqlite3.Connection, email_str: str) ->\
         Union[bool, str]:
-    """Argparse type validator for a member's email"""
+    """Validator for a member's email"""
     full_name, email_addr = parseaddr(email_str)
     if not email_addr or "@" not in email_str[1:-3]:
         __log__.error("invalid email: please use format: name@addr")
@@ -66,7 +66,7 @@ def valid_email(database: sqlite3.Connection, email_str: str) ->\
 
 
 def valid_name(name_str: str) -> bool:
-    """Argparse type validator for a member's name"""
+    """Validator for a member's name"""
     if len(name_str) < 1 or 20 < len(name_str):
         __log__.error("invalid name length: choose between 1 to 20 characters")
         return False
