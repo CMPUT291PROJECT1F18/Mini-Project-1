@@ -80,9 +80,9 @@ class MiniProjectShell(cmd.Cmd):
 
     @logged_in
     def do_show_inbox(self, arg):
-        """View your inbox and all messages contained
+        """View all inbox messages related to the currently logged in email
 
-        Set all viewed messages as seen="T"
+        Set all viewed messages as seen="y"
         """
         # view all messages within your inbox
         inbox_items = self.database.execute(
@@ -96,7 +96,7 @@ class MiniProjectShell(cmd.Cmd):
         # set all messages within your inbox as seen="T"
         self.database.execute(
             "UPDATE inbox "
-            "SET seen='T' " 
+            "SET seen='y' " 
             "WHERE inbox.email = ?",
             (self.login_session.get_email(),))
         self.database.commit()
