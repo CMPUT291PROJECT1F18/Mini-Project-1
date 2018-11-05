@@ -447,7 +447,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid list_requests arguement")
 
-    def help_list_requests(self):
+    @staticmethod
+    def help_list_requests():
         """Print the argparser help message for list_requests"""
         get_list_ride_requests_parser().print_help()
 
