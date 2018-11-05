@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""Search for rides.
+"""Search for rides
 
 The member should be able to enter 1-3 location keywords and retrieve all
 rides that match all keywords. A ride matches a keyword if the keyword

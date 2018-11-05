@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""functionality defining the ``post_ride_request`` requirement
+"""Post a ride request
 
 Post ride requests. The member should be able to post a ride request
 by providing a date, a pick up location code, a drop off location code,

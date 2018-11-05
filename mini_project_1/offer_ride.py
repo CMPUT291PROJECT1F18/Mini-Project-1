@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""Offer a ride.
+"""Offer a ride
 
 The member should be able to offer rides by providing a date, the number of
 seats offered, the price per seat, a luggage description, a source location,

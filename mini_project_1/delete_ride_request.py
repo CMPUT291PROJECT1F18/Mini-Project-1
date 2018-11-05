@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""functionality defining the ``delete_ride_request`` requirement
+"""Delete a ride request
 
 The member should be able to delete any of his/her ride requests.
 """

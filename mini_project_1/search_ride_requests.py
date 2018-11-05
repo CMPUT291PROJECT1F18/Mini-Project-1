@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""functionality defining the ``search_ride_request`` requirement
+"""Search for a ride request
 
 The member should be able to see all his/her ride requests. Also the member
 should be able to provide a location code or a city and see a listing of all

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""functionality defining the ``cancel_booking`` requirement
+"""Cancel a booking
 
 The member should be able to cancel any booking on rides s/he offers.
 For any booking that is cancelled (i.e. being deleted from the booking table),
