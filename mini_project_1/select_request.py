@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""functionality defining the ``select_request`` requirement"""
+"""Select a ride request"""
 
 from mini_project_1.common import ShellArgumentParser
 
