@@ -11,6 +11,7 @@ import logging
 from logging import getLogger, basicConfig, Formatter
 from logging.handlers import TimedRotatingFileHandler
 
+from mini_project_1.register import email, phone, name, password
 from mini_project_1.shell import MiniProjectShell
 
 __log__ = getLogger(__name__)
@@ -62,6 +63,13 @@ def get_parser() -> argparse.ArgumentParser:
                        help="Create a example SQLITE database file "
                             "for mini-project-1 at the path specified "
                             "and connect to it")
+
+    subparsers = parser.add_subparsers(help='registration help')
+    registration_parser = subparsers.add_parser("registration")
+    registration_parser.add_argument("email", type=email, help="A unique email to register and login with")
+    registration_parser.add_argument("phone", type=phone, help="A phone number to register with")
+    registration_parser.add_argument("name", type=name, help="A name (first and last) to register with")
+    registration_parser.add_argument("password", type=password, help="A password to register and login with")
 
     group = parser.add_argument_group(title="Logging")
     group.add_argument("--log-level", dest="log_level", default="INFO",

@@ -8,6 +8,7 @@ import sqlite3
 import pytest
 import mini_project_1
 from mini_project_1.shell import MiniProjectShell
+from mini_project_1.register import check_valid_email
 
 
 DATABASE_DIR = os.path.join(
@@ -63,3 +64,13 @@ def test_logout(mock_db):
     assert shell.login_session
     shell.logout()
     assert not shell.login_session
+
+
+def test_check_valid_email(mock_db):
+    database = sqlite3.connect(mock_db)
+
+    # check for a valid new unique email
+    assert check_valid_email(database, "crazyuniqueemail@example.com")
+
+    # check for a invalid new unique email
+    assert not check_valid_email(database, "bob@123.ca")
