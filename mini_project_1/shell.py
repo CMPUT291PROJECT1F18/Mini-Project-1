@@ -351,7 +351,7 @@ class MiniProjectShell(cmd.Cmd):
             if len(to_delete) == 0:
                 print("You don't have a booking where bno={}".format(args.bno))
                 print("Your bookings:")
-                self.do_list_bookings(self)
+                self.do_list_bookings("")
                 return
 
             cur.execute(
@@ -470,7 +470,8 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid argument")
 
-    def help_search_requests_lcode(self):
+    @staticmethod
+    def help_search_requests_lcode():
         """Print the argparser help message for searching ride requests by
         location code"""
         get_search_requests_lcode_parser().print_help()
@@ -521,7 +522,7 @@ class MiniProjectShell(cmd.Cmd):
                 print("You don't have a ride request where rid={}"
                       .format(args.rid))
                 print("Your requests:")
-                self.do_list_requests(self)
+                self.do_list_requests("")
                 return
 
             cur.execute(
