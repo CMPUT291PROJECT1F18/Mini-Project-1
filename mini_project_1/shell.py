@@ -514,6 +514,10 @@ class MiniProjectShell(cmd.Cmd):
             )
             selected = cur.fetchone()
 
+            if selected is None:
+                print("There is no ride request with rid={}".format(args.rid))
+                return
+
             print("You have selected: {}".format(selected))
             while True:
                 response = \
@@ -534,10 +538,11 @@ class MiniProjectShell(cmd.Cmd):
                          pendulum.now().to_datetime_string(),
                          self.login_session.get_email(),
                          message,
-                         0,  # TODO: What to put here? - A none value.
+                         None,
                          "n")
                     )
                     self.database.commit()
+                    print("Successfully sent message to {}".format(poster))
                     break
                 elif response == "n":
                     break
