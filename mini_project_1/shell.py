@@ -1,23 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""Main command shell for mini-project-1"""
+"""command shell for mini-project-1"""
 
-import argparse
-import sys
 import cmd
 import sqlite3
 from getpass import getpass
 from logging import getLogger
 
-import pendulum
-
+from mini_project_1.cancel_booking import get_cancel_booking_parser
+from mini_project_1.common import ShellArgumentException, MINI_PROJECT_DATE_FMT
+from mini_project_1.delete_ride_request import get_delete_ride_request_parser
 from mini_project_1.loginsession import LoginSession
+from mini_project_1.post_ride_request import get_post_ride_request_parser
+from mini_project_1.search_ride_requests import \
+    get_search_ride_requests_by_city_name_parser, \
+    get_search_ride_requests_by_location_code_parser
 
 __log__ = getLogger(__name__)
-
-
-MINI_PROJECT_DATE_FMT = "%Y-%m-%d"
 
 
 def logged_in(f):
@@ -356,16 +356,6 @@ class MiniProjectShell(cmd.Cmd):
             raise ShellArgumentException("invalid location code: {}".format(location_code_str))
 
 
-class ShellArgumentException(Exception):
-    def __init__(self, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
-
-
-class ShellArgumentParser(argparse.ArgumentParser):
-    def error(self, message):
-        self.print_help(sys.stderr)
-        raise ShellArgumentException(message)
-
 
 def print_5_and_prompt(rows):
     if len(rows) > 5:
@@ -383,94 +373,3 @@ def print_5_and_prompt(rows):
             print(row)
 
 
-def price(price_string: str) -> int:
-    """Argparser type validation function for validating a price for use in
-    ``post_ride_request`` command"""
-    price = int(price_string)
-    if price < 0:
-        raise argparse.ArgumentTypeError(
-            "invalid price: {} (please choose a non negative price)".format(
-                price_string
-            )
-        )
-    return price
-
-
-def date(date_str: str) -> pendulum.DateTime:
-    """Argparser type validation function for validating a date for use
-    in ``post_ride_request`` command"""
-    date = pendulum.parse(date_str)
-    if date >= pendulum.today().subtract(days=1):
-        return date
-    else:
-        raise argparse.ArgumentTypeError(
-            "invalid date: {} (please choose a date from today {} forwards)".format(
-                date_str, pendulum.today().strftime(MINI_PROJECT_DATE_FMT)
-            )
-        )
-
-
-def get_post_ride_request_parser() -> ShellArgumentParser:
-    """Get a :class:`ShellArgumentParser` for use in parsing the arguments
-    for a ``post_ride_request`` command"""
-    parser = ShellArgumentParser(
-        add_help=False,
-        description="Post a ride request")
-
-    parser.add_argument("date", type=date,
-                        help="Date the ride should start on")
-    parser.add_argument("pickup",
-                        help="The location code for the pickup location of "
-                             "the ride")
-    parser.add_argument("dropoff",
-                        help="The location code for the dropoff location of "
-                             "the ride")
-    parser.add_argument("price", type=price,
-                        help="The maximum amount you are willing to pay per "
-                             "seat for the ride")
-    return parser
-
-
-def get_cancel_booking_parser() -> ShellArgumentParser:
-    """Get a :class:`ShellArgumentParser` for use in parsing the arguments
-    for a ``cancel_booking`` command"""
-    parser = ShellArgumentParser(
-        add_help=False,
-        description="Cancel a booking")
-
-    parser.add_argument("bno", type=int,
-                        help="The booking identification number")
-    return parser
-
-
-def get_search_ride_requests_by_location_code_parser() -> ShellArgumentParser:
-    parser = ShellArgumentParser(
-        add_help=False,
-        description="Search ride requests by location code")
-
-    parser.add_argument("lcode", type=str,
-                        help="The location code to search by")
-
-    return parser
-
-
-def get_search_ride_requests_by_city_name_parser() -> ShellArgumentParser:
-    parser = ShellArgumentParser(
-        add_help=False,
-        description="Search ride requests by city name")
-
-    parser.add_argument("city", type=str,
-                        help="The name of the city to search by")
-
-    return parser
-
-
-def get_delete_ride_request_parser() -> ShellArgumentParser:
-    parser = ShellArgumentParser(
-        add_help=False,
-        description="Delete a ride request by rid")
-
-    parser.add_argument("rid", type=int,
-                        help="The ID of the ride request to delete")
-
-    return parser

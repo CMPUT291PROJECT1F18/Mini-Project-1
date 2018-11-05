@@ -20,7 +20,8 @@ __log__ = getLogger(__name__)
 
 def check_valid_email(database: sqlite3.Connection, email: str) -> bool:
     """Check if a given email is unique to the mini-project-1 database"""
-    email_hits = database.execute("SELECT email from members where email = ?", (email, )).fetchone()
+    email_hits = database.execute("SELECT email from members where email = ?",
+                                  (email, )).fetchone()
     if email_hits:
         return False
     else:
@@ -68,14 +69,19 @@ def name(name_str: str) -> str:
         return name_str
 
 
-def register_member(database: sqlite3.Connection, email: str, name: str, phone: str, password: str):
+def register_member(database: sqlite3.Connection, email: str, name: str,
+                    phone: str, password: str):
     """Register a new member into the mini-project-1 database"""
     if check_valid_email(database, email):
-        database.execute("INSERT INTO members VALUES (?, ?, ?, ?)", (email, name, phone, password))
+        database.execute("INSERT INTO members VALUES (?, ?, ?, ?)",
+                         (email, name, phone, password))
         database.commit()
-        __log__.info("registered user: email: {} name: {} phone: {}".format(email, name, phone))
+        __log__.info("registered user: email: {} name: {} phone: {}".format(
+            email, name, phone))
     else:
-        raise Exception("email {} already taken: please choose an alternative".format(email))
+        raise Exception(
+            "email {} already taken: please choose an alternative".format(
+                email))
 
 
 def get_parser() -> argparse.ArgumentParser:
