@@ -25,7 +25,7 @@ def get_offer_ride_parser() -> ShellArgumentParser:
 
     # date, seats, price, luggage, source, destination, cno, enroute
     parser.add_argument("date", type=date,
-                        help="Date the ride should start on")
+                        help="Date the ride should start on (eg: 1975-05-21T22:00:00)")
     parser.add_argument("seats", type=greater_than_zero_number,
                         help="The number of seats offered")
     parser.add_argument("price", type=price,

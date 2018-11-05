@@ -52,7 +52,7 @@ def get_post_request_parser() -> ShellArgumentParser:
         description="Post a ride request")
 
     parser.add_argument("date", type=date,
-                        help="Date the ride should start on")
+                        help="Date the ride should start on (eg: 1975-05-21T22:00:00)")
     parser.add_argument("pickup",
                         help="The location code for the pickup location of "
                              "the ride")
