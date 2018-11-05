@@ -199,9 +199,7 @@ class MiniProjectShell(cmd.Cmd):
                             'WHERE pickup=?;'
             cur.execute(list_requests, (args.lcode,))
             rows = cur.fetchall()
-            # TODO: Limit to 5, ask if user wants more
-            for row in rows:
-                print(row)
+            print_5_and_prompt(rows)
         except ShellArgumentException:
             __log__.error("invalid argument")
 
@@ -224,9 +222,7 @@ class MiniProjectShell(cmd.Cmd):
                             'AND locations.city=?;'
             cur.execute(list_requests, (args.city.lower(),))
             rows = cur.fetchall()
-            # TODO: Limit to 5, ask if user wants more
-            for row in rows:
-                print(row)
+            print_5_and_prompt(rows)
         except ShellArgumentException:
             __log__.error("invalid argument")
 
@@ -319,6 +315,22 @@ class ShellArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         self.print_help(sys.stderr)
         raise ShellArgumentException(message)
+
+
+def print_5_and_prompt(rows):
+    if len(rows) > 5:
+        print("First 5 rows:")
+        for row in rows[:5]:
+            print(row)
+        see_more = input(
+            "Enter 'all' to see all results or enter anything else to finish.\n").lower()
+        if see_more == "all":
+            print("All rows:")
+            for row in rows:
+                print(row)
+    else:
+        for row in rows:
+            print(row)
 
 
 def price(price_string: str) -> int:
