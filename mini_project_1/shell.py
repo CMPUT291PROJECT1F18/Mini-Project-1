@@ -13,19 +13,24 @@ import pendulum
 from mini_project_1.book_member import get_book_member_parser, book_member
 from mini_project_1.cancel_booking import get_cancel_booking_parser
 from mini_project_1.common import ShellArgumentException, \
-    MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, get_selection, send_message, check_valid_email, \
-    check_valid_lcode
+    MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, \
+    get_selection, send_message, check_valid_email, check_valid_lcode
 from mini_project_1.delete_request import get_delete_request_parser
+from mini_project_1.list_bookings import get_list_bookings_parser
+from mini_project_1.list_requests import get_list_ride_requests_parser
 from mini_project_1.loginsession import LoginSession
+from mini_project_1.logout import get_logout_parser
 from mini_project_1.register import valid_password, \
     register_member, valid_name, valid_phone, valid_email
-from mini_project_1.offer_ride import get_offer_ride_parser, check_valid_cno, offer_ride
+from mini_project_1.offer_ride import get_offer_ride_parser, \
+    check_valid_cno, offer_ride
 from mini_project_1.post_request import get_post_request_parser
 from mini_project_1.search_requests import \
     get_search_requests_city_parser, \
     get_search_requests_lcode_parser, print_5_and_prompt
 from mini_project_1.search_rides import get_search_for_ride_parser
 from mini_project_1.select_request import get_select_request_parser
+from mini_project_1.show_inbox import get_show_inbox_parser
 
 __log__ = getLogger(__name__)
 
@@ -71,7 +76,7 @@ class MiniProjectShell(cmd.Cmd):
     # ===============================
 
     def do_login(self, arg):
-        """Login to the mini-project-1 database: login"""
+        """Login to the mini-project-1 database"""
         if self.login_session:
             __log__.error("already logged in")
         else:
@@ -81,13 +86,22 @@ class MiniProjectShell(cmd.Cmd):
             self.login(username, password)
             if not self.login_session:
                 self.do_login(None)
-            else:
-                self.do_show_inbox(None)
+            self.do_show_inbox("")
 
     @logged_in
     def do_logout(self, arg):
-        """Logout to the mini-project-1 database: logout"""
-        self.logout()
+        """Logout from the mini-project-1 database"""
+        parser = get_logout_parser()
+        try:
+            parser.parse_args(arg.split())
+            self.logout()
+        except ShellArgumentException:
+            __log__.exception("invalid logout arguement")
+
+    @staticmethod
+    def help_logout():
+        """Print the argparser help message for logout"""
+        get_logout_parser().print_help()
 
     def do_exit(self, arg):
         """Logout (if needed) and exit out of the mini-project-1 shell: exit"""
@@ -104,29 +118,39 @@ class MiniProjectShell(cmd.Cmd):
 
         Set all viewed messages as seen="y"
         """
-        # view all unseen messages within your inbox
-        inbox_items = self.database.execute(
-            "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
-            "FROM inbox "
-            "WHERE inbox.email = ? AND inbox.seen = 'n'",
-            (self.login_session.get_email(),)
-        ).fetchall()
-
-        if inbox_items:
-            print("Your inbox:")
-            for inbox_item in inbox_items:
-                print(inbox_item)
-
-            # set all messages within your inbox as seen="y"
-            self.database.execute(
-                "UPDATE inbox "
-                "SET seen='y' " 
-                "WHERE inbox.email = ?",
+        parser = get_show_inbox_parser()
+        try:
+            parser.parse_args(arg.split())
+            # view all messages within your inbox
+            inbox_items = self.database.execute(
+                "SELECT DISTINCT email, msgTimestamp, sender, content, rno, seen "
+                "FROM inbox "
+                "WHERE inbox.email = ? AND inbox.seen = 'n'",
                 (self.login_session.get_email(),)
-            )
-            self.database.commit()
-        else:
-            print("No new messages")
+            ).fetchall()
+
+            if inbox_items:
+                print("Your inbox:")
+                for inbox_item in inbox_items:
+                    print(inbox_item)
+
+                # set all messages within your inbox as seen="y"
+                self.database.execute(
+                    "UPDATE inbox "
+                    "SET seen='y' " 
+                    "WHERE inbox.email = ?",
+                    (self.login_session.get_email(),)
+                )
+                self.database.commit()
+            else:
+                print("No new messages")
+        except ShellArgumentException:
+            __log__.exception("invalid show_inbox argument")
+
+    @staticmethod
+    def help_show_inbox():
+        """Print the argparser help message for show_inbox"""
+        get_show_inbox_parser().print_help()
 
     @logged_in
     def do_offer_ride(self, arg):
@@ -136,8 +160,12 @@ class MiniProjectShell(cmd.Cmd):
         try:
             args = parser.parse_args(arg.split())
             try:
-                source = get_location_id(dbcursor, args.src, "Choose a source: ")
-                destination = get_location_id(dbcursor, args.dst, "Choose a destination: ")
+                source = \
+                    get_location_id(dbcursor, args.src,
+                                    "Choose a source: ")
+                destination = \
+                    get_location_id(dbcursor, args.dst,
+                                    "Choose a destination: ")
             except ValueNotFoundException as e:
                 print(e)
                 raise ShellArgumentException
@@ -160,10 +188,10 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid offer_ride argument")
 
-    def help_offer_ride(self):
-        """Parser help message for offering a ride"""
-        parser = get_offer_ride_parser()
-        parser.print_help()
+    @staticmethod
+    def help_offer_ride():
+        """Print the argparser help message for offer_ride"""
+        get_offer_ride_parser().print_help()
 
     @logged_in
     def do_search_rides(self, arg):
@@ -211,33 +239,48 @@ class MiniProjectShell(cmd.Cmd):
                 selection = get_selection(results)
                 # message the posting ride member
                 if selection:
-                    send_message(self.database, selection[7], self.login_session.get_email(),
-                                 "I want to book seats on this ride", selection[0])
+                    send_message(
+                        self.database,
+                        selection[7],
+                        self.login_session.get_email(),
+                        "I want to book seats on this ride",
+                        selection[0]
+                    )
                     print("Message sent to driver")
             else:
                 print("No results")
         except ShellArgumentException:
             __log__.error("invalid search_rides argument")
 
-    def help_search_rides(self):
-        """Parser help message for searching rides"""
-        parser = get_search_for_ride_parser()
-        parser.print_help()
+    @staticmethod
+    def help_search_rides():
+        """Print the argparser help message for search_rides"""
+        get_search_for_ride_parser().print_help()
 
     @logged_in
     def do_list_bookings(self, arg):
         """List all the bookings that the user offers"""
-        cur = self.database.cursor()
-        cur.execute(
-            'SELECT DISTINCT bookings.* '
-            'FROM bookings, rides '
-            'WHERE rides.driver = ? '
-            'AND rides.rno = bookings.rno;',
-            (self.login_session.get_email(),)
-        )
-        rows = cur.fetchall()
-        for row in rows:
-            print(row)
+        parser = get_list_bookings_parser()
+        try:
+            parser.parse_args(arg.split())
+            cur = self.database.cursor()
+            cur.execute(
+                'SELECT DISTINCT bookings.* '
+                'FROM bookings, rides '
+                'WHERE rides.driver = ? '
+                'AND rides.rno = bookings.rno;',
+                (self.login_session.get_email(),)
+            )
+            rows = cur.fetchall()
+            for row in rows:
+                print(row)
+        except ShellArgumentException:
+            __log__.exception("invalid list_bookings argument")
+
+    @staticmethod
+    def help_list_bookings():
+        """Print the argparser help message for list_bookings"""
+        get_list_bookings_parser().print_help()
 
     @logged_in
     def do_book_member(self, arg):
@@ -294,10 +337,10 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid book_member argument")
 
-    def help_book_member(self):
-        """Parser help message for booking a member"""
-        parser = get_search_for_ride_parser()
-        parser.print_help()
+    @staticmethod
+    def help_book_member():
+        """Print the argparser help message for book_member"""
+        get_search_for_ride_parser().print_help()
 
     @logged_in
     def do_cancel_booking(self, arg):
@@ -319,7 +362,7 @@ class MiniProjectShell(cmd.Cmd):
             if len(to_delete) == 0:
                 print("You don't have a booking where bno={}".format(args.bno))
                 print("Your bookings:")
-                self.do_list_bookings(self)
+                self.do_list_bookings("")
                 return
 
             cur.execute(
@@ -339,7 +382,8 @@ class MiniProjectShell(cmd.Cmd):
             cur.execute(
                 "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);",
                 (to_delete[1], pendulum.now().to_datetime_string(),
-                 self.login_session.get_email(), "Your booking has been cancelled.",
+                 self.login_session.get_email(),
+                 "Your booking has been cancelled.",
                  to_delete[2], "n")
             )
             self.database.commit()
@@ -348,10 +392,10 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid cancel_booking argument")
 
-    def help_cancel_booking(self):
-        """Parser help message for cancelling a booking"""
-        parser = get_cancel_booking_parser()
-        parser.print_help()
+    @staticmethod
+    def help_cancel_booking():
+        """Print the argparser help message for cancel_booking"""
+        get_cancel_booking_parser().print_help()
 
     @logged_in
     def do_post_request(self, arg):
@@ -383,39 +427,49 @@ class MiniProjectShell(cmd.Cmd):
             __log__.exception("invalid post_ride_request argument")
         else:
             __log__.info(
-                "succesfully posted ride request: "
-                "rid: {} email: {} date: {} pickup: {} dropoff: {} price: {}".format(
+                "successfully posted ride request: "
+                "rid: {} email: {} date: {} pickup: {} dropoff: {} price: {}"
+                "".format(
                     rid, self.login_session.get_email(),
                     args.date.strftime(MINI_PROJECT_DATE_FMT),
                     args.pickup, args.dropoff, args.price
                 )
             )
 
-    def help_post_request(self):
-        """Post a ride request's parsers help message"""
-        parser = get_post_request_parser()
-        parser.print_help()
+    @staticmethod
+    def help_post_request():
+        """Print the argparser help message for post_request"""
+        get_post_request_parser().print_help()
 
     @logged_in
     def do_list_requests(self, arg):
         """List all the user's ride requests"""
-        cur = self.database.cursor()
-        cur.execute(
-            'SELECT DISTINCT * ' 
-            'FROM requests ' 
-            'WHERE email = ?',
-            (self.login_session.get_email().lower(),)
-        )
-        rows = cur.fetchall()
-        for row in rows:
-            print(row)
+        parser = get_list_ride_requests_parser()
+        try:
+            parser.parse_args(arg.split())
+            cur = self.database.cursor()
+            cur.execute(
+                'SELECT DISTINCT * ' 
+                'FROM requests ' 
+                'WHERE email = ?',
+                (self.login_session.get_email().lower(),)
+            )
+            rows = cur.fetchall()
+            for row in rows:
+                print(row)
+        except ShellArgumentException:
+            __log__.exception("invalid list_requests argument")
+
+    @staticmethod
+    def help_list_requests():
+        """Print the argparser help message for list_requests"""
+        get_list_ride_requests_parser().print_help()
 
     @logged_in
     def do_search_requests_lcode(self, arg):
         """Search for a ride request by location number"""
         cur = self.database.cursor()
         parser = get_search_requests_lcode_parser()
-
         try:
             args = parser.parse_args(arg.split())
             cur.execute(
@@ -429,17 +483,17 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid argument")
 
-    def help_search_requests_lcode(self):
-        """Parser help message for searching ride requests by location code"""
-        parser = get_search_requests_lcode_parser()
-        parser.print_help()
+    @staticmethod
+    def help_search_requests_lcode():
+        """Print the argparser help message for searching ride requests by
+        location code"""
+        get_search_requests_lcode_parser().print_help()
 
     @logged_in
     def do_search_requests_city(self, arg):
         """Search for a ride quest by city name"""
         cur = self.database.cursor()
         parser = get_search_requests_city_parser()
-
         try:
             args = parser.parse_args(arg.split())
             cur.execute(
@@ -454,17 +508,17 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid argument")
 
-    def help_search_requests_city(self):
-        """Parser help message for searching ride requests by city name"""
-        parser = get_search_requests_city_parser()
-        parser.print_help()
+    @staticmethod
+    def help_search_requests_city():
+        """Print the argparser help message for searching ride requests
+        by city name"""
+        get_search_requests_city_parser().print_help()
 
     @logged_in
     def do_delete_request(self, arg):
         """Delete a ride request"""
         cur = self.database.cursor()
         parser = get_delete_request_parser()
-
         try:
             args = parser.parse_args(arg.split())
             cur.execute(
@@ -479,7 +533,7 @@ class MiniProjectShell(cmd.Cmd):
                 print("You don't have a ride request where rid={}"
                       .format(args.rid))
                 print("Your requests:")
-                self.do_list_requests(self)
+                self.do_list_requests("")
                 return
 
             cur.execute(
@@ -494,17 +548,16 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.exception("invalid argument")
 
-    def help_delete_request(self):
-        """Parser help message for deleting a ride request"""
-        parser = get_delete_request_parser()
-        parser.print_help()
+    @staticmethod
+    def help_delete_request():
+        """Print the argparser help message for deleting a ride request"""
+        get_delete_request_parser().print_help()
 
     @logged_in
     def do_select_request(self, arg):
         """Select a ride request and perform actions"""
         cur = self.database.cursor()
         parser = get_select_request_parser()
-
         try:
             args = parser.parse_args(arg.split())
             cur.execute(
@@ -550,10 +603,10 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid argument")
 
-    def help_select_request(self):
-        """Parser help message for selecting a ride request"""
-        parser = get_select_request_parser()
-        parser.print_help()
+    @staticmethod
+    def help_select_request():
+        """Print the argparser help message for selecting a ride request"""
+        get_select_request_parser().print_help()
 
     def do_register(self, arg):
         """Register a new member to the mini-project-1 database"""
@@ -615,7 +668,7 @@ class MiniProjectShell(cmd.Cmd):
         attempt to login with the given email and password.
 
         If the login attempt is successful set the shell's ``login_session``
-        to the newly created :class:`LoginSession`.
+        to the newly created :class:`.loginsession.LoginSession`.
         """
         if self.login_session:
             __log__.error("already logged in as user: {}".format(

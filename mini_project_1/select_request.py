@@ -8,6 +8,7 @@ from mini_project_1.common import ShellArgumentParser
 
 def get_select_request_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
+        prog="select_request",
         add_help=False,
         description="Select a ride request and perform actions with it"
     )
