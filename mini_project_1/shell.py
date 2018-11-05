@@ -206,7 +206,6 @@ class MiniProjectShell(cmd.Cmd):
         except ShellArgumentException:
             __log__.error("invalid offer_ride argument")
 
-
     def help_search_rides(self):
         """Parser help message for offering a ride"""
         parser = get_search_for_ride_parser()

@@ -68,7 +68,7 @@ def get_selection(items: list):
 
             if selection.isnumeric():
                 selection = int(selection)
-                if 0 < selection < len(items):
+                if -1 < selection < len(items):
                     return items[selection]
             elif selection == "exit":
                 return None
@@ -78,7 +78,7 @@ def get_selection(items: list):
 
             if selection.isnumeric():
                 selection = int(selection)
-                if 0 < selection < len(items):
+                if -1 < selection < len(items):
                     return items[selection]
             elif selection == "exit":
                 return None

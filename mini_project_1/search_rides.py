@@ -19,7 +19,7 @@ from mini_project_1.common import ShellArgumentParser
 def get_search_for_ride_parser() -> ShellArgumentParser:
     parser = ShellArgumentParser(
         add_help=False,
-        description="Offer a ride")
+        description="Search for a ride and if one is selected sent a message of intent to join")
     parser.add_argument("term1",
                         help="Location search term to use to look rides")
     parser.add_argument("term2", nargs='?', default=None,

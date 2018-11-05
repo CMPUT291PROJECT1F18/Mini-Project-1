@@ -49,9 +49,6 @@ def offer_ride(database: sqlite3.Connection, member: LoginSession, date: pendulu
     dbcursor = database.cursor()
     dbcursor.execute("SELECT MAX(rno) FROM rides")
     rno = str(int(dbcursor.fetchone()[0]) + 1)
-    print(rno, price, date, seats, luggage, source, destination, member.get_email())
-    print(cno)
-    print(enroute)
 
     try:
         dbcursor.execute(
