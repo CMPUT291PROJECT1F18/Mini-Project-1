@@ -238,7 +238,42 @@ class MiniProjectShell(cmd.Cmd):
     @logged_in
     def do_delete_ride_request(self, arg):
         """Delete a ride request"""
-        # TODO:
+        cur = self.database.cursor()
+        parser = get_delete_ride_request_parser()
+
+        try:
+            args = parser.parse_args(arg.split())
+
+            request_to_delete = "SELECT DISTINCT * FROM requests " \
+                                "WHERE rid=? " \
+                                "AND email=?;"
+            cur.execute(request_to_delete,
+                        (args.rid, self.login_session.get_email(),))
+            to_delete = cur.fetchall()
+
+            if len(to_delete) == 0:
+                print("You don't have a ride request where rid={}"
+                      .format(args.rid))
+                print("Your requests:")
+                self.do_list_ride_requests(self)
+                return
+
+            cancel_request = "DELETE FROM requests " \
+                             "WHERE rid=? " \
+                             "AND email=?;"
+
+            cur.execute(cancel_request,
+                        (args.rid, self.login_session.get_email(),))
+            self.database.commit()
+
+            print("Successfully deleted:\n{}".format(to_delete))
+        except ShellArgumentException:
+            __log__.error("invalid argument")
+
+    def help_delete_ride_request(self):
+        """Parser help message for deleting a ride request"""
+        parser = get_delete_ride_request_parser()
+        parser.print_help()
 
     # ===============================
     # Shell functionality definitions
@@ -345,5 +380,16 @@ def get_search_ride_requests_by_city_name_parser() -> ShellArgumentParser:
 
     parser.add_argument("city", type=str,
                         help="The name of the city to search by")
+
+    return parser
+
+
+def get_delete_ride_request_parser() -> ShellArgumentParser:
+    parser = ShellArgumentParser(
+        add_help=False,
+        description="Delete a ride request by rid")
+
+    parser.add_argument("rid", type=int,
+                        help="The ID of the ride request to delete")
 
     return parser
