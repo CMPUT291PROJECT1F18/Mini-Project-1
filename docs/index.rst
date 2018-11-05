@@ -11,7 +11,7 @@ This code is open source, and is `available on GitHub`_.
 
    Overview<readme>
    Shell Startup Command Line Usage<commands>
-
+   mini-project-1 Shell Command Line Usage <shellcommands>
 
 Indices and tables
 ==================
