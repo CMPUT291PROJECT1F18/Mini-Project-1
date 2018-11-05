@@ -71,6 +71,83 @@ def test_logout(mock_db):
     assert not shell.login_session
 
 
+def test_register(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+
+
+def test_select_request(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_delete_request(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_search_requests_city(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_search_requests_lcode(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_list_requests(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_post_request(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_cancel_booking(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_book_member(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_list_bookings(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_search_rides(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_offer_ride(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
+def test_show_inbox(mock_db):
+    database = sqlite3.connect(mock_db)
+    shell = MiniProjectShell(database)
+    shell.login("bob@123.ca", "foo")
+
+
 def test_help_messsages(mock_db):
     """Test all the shell's ``help_<command>`` methods
 
