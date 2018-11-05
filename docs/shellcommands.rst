@@ -153,3 +153,13 @@ Logout (if needed) and exit out of the mini-project-1 shell.
 .. code-block:: bash
 
     usage: exit
+
+
+help
+====
+
+List available commands with "help" or detailed help with "help cmd".
+
+.. code-block:: bash
+
+    usage: help [cmd]
