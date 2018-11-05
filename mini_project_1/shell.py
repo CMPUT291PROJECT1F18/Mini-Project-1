@@ -200,9 +200,9 @@ class MiniProjectShell(cmd.Cmd):
         parser = get_search_for_ride_parser()
         try:
             args = parser.parse_args(arg.split())
-            search_conditions = "(l1.lcode = ? OR l1.city LIKE ? OR l1.prov LIKE ? OR l1.address LIKE ? OR " + \
-                "l2.lcode = ? OR l2.city LIKE ? OR l2.prov LIKE ? OR l2.address LIKE ? OR " + \
-                "l3.lcode = ? OR l3.city LIKE ? OR l3.prov LIKE ? OR l3.address LIKE ?)"
+            search_conditions = "(l1.lcode LIKE ? OR l1.city LIKE ? OR l1.prov LIKE ? OR l1.address LIKE ? OR " + \
+                "l2.lcode LIKE ? OR l2.city LIKE ? OR l2.prov LIKE ? OR l2.address LIKE ? OR " + \
+                "l3.lcode LIKE ? OR l3.city LIKE ? OR l3.prov LIKE ? OR l3.address LIKE ?)"
 
             # setup query conditions for one term
             search_string = search_conditions
