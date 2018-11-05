@@ -240,8 +240,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def help_search_rides(self):
         """Parser help message for searching rides"""
-        parser = get_search_for_ride_parser()
-        parser.print_help()
+        get_search_for_ride_parser().print_help()
 
     @logged_in
     def do_list_bookings(self, arg):
@@ -324,8 +323,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def help_book_member(self):
         """Parser help message for booking a member"""
-        parser = get_search_for_ride_parser()
-        parser.print_help()
+        get_search_for_ride_parser().print_help()
 
     @logged_in
     def do_cancel_booking(self, arg):
@@ -490,8 +488,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def help_search_requests_city(self):
         """Parser help message for searching ride requests by city name"""
-        parser = get_search_requests_city_parser()
-        parser.print_help()
+        get_search_requests_city_parser().print_help()
 
     @logged_in
     def do_delete_request(self, arg):
@@ -530,8 +527,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def help_delete_request(self):
         """Parser help message for deleting a ride request"""
-        parser = get_delete_request_parser()
-        parser.print_help()
+        get_delete_request_parser().print_help()
 
     @logged_in
     def do_select_request(self, arg):
@@ -581,8 +577,7 @@ class MiniProjectShell(cmd.Cmd):
 
     def help_select_request(self):
         """Parser help message for selecting a ride request"""
-        parser = get_select_request_parser()
-        parser.print_help()
+        get_select_request_parser().print_help()
 
     def do_register(self, arg):
         """Register a new member to the mini-project-1 database"""
