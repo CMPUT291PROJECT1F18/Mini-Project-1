@@ -396,7 +396,7 @@ def date(date_str: str) -> pendulum.DateTime:
     """Argparser type validation function for validating a date for use
     in ``post_ride_request`` command"""
     date = pendulum.parse(date_str)
-    if date >= pendulum.today():
+    if date >= pendulum.today().subtract(days=1):
         return date
     else:
         raise argparse.ArgumentTypeError(
