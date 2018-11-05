@@ -80,7 +80,7 @@ class MiniProjectShell(cmd.Cmd):
             username = str(input("username: "))
             password = getpass("password: ")
             self.login(username, password)
-            while not self.login_session:
+            if not self.login_session:
                 self.do_login(None)
 
     @logged_in
