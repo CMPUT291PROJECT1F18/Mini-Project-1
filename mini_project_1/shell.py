@@ -103,18 +103,22 @@ class MiniProjectShell(cmd.Cmd):
             "WHERE inbox.email = ? AND inbox.seen = 'n'",
             (self.login_session.get_email(),)
         ).fetchall()
-        print("Your inbox:")
-        for inbox_item in inbox_items:
-            print(inbox_item)
 
-        # set all messages within your inbox as seen="y"
-        self.database.execute(
-            "UPDATE inbox "
-            "SET seen='y' " 
-            "WHERE inbox.email = ?",
-            (self.login_session.get_email(),)
-        )
-        self.database.commit()
+        if inbox_items:
+            print("Your inbox:")
+            for inbox_item in inbox_items:
+                print(inbox_item)
+
+            # set all messages within your inbox as seen="y"
+            self.database.execute(
+                "UPDATE inbox "
+                "SET seen='y' " 
+                "WHERE inbox.email = ?",
+                (self.login_session.get_email(),)
+            )
+            self.database.commit()
+        else:
+            print("No new messages")
 
     @logged_in
     def do_offer_ride(self, arg):
