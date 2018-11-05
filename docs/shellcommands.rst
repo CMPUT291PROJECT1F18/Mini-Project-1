@@ -1,6 +1,6 @@
-#################################
-MiniProjectShell Command Line Use
-#################################
+#####################################
+Mini-Project-1 Shell Command Line Use
+#####################################
 
 Below is usage documentation on using the mini-project-1 shell and
 the various commands associated with it.
