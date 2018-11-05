@@ -110,28 +110,29 @@ def test_delete_request(mock_db):
     assert not database.cursor().execute("SELECT DISTINCT * FROM requests WHERE rid = 16").fetchone()
 
 
-def test_search_requests_city(mock_db):
-    database = sqlite3.connect(mock_db)
-    shell = MiniProjectShell(database)
-    shell.login("bob@123.ca", "foo")
+# def test_search_requests_city(mock_db): TODO
+#     pass
 
 
-def test_search_requests_lcode(mock_db):
-    database = sqlite3.connect(mock_db)
-    shell = MiniProjectShell(database)
-    shell.login("bob@123.ca", "foo")
+# def test_search_requests_lcode(mock_db): TODO
+#     pass
 
 
-def test_list_requests(mock_db):
-    database = sqlite3.connect(mock_db)
-    shell = MiniProjectShell(database)
-    shell.login("bob@123.ca", "foo")
+# def test_list_requests(mock_db):
+#     database = sqlite3.connect(mock_db)
+#     shell = MiniProjectShell(database)
+#     shell.login("bob@123.ca", "foo")
 
 
 def test_post_request(mock_db):
     database = sqlite3.connect(mock_db)
     shell = MiniProjectShell(database)
     shell.login("bob@123.ca", "foo")
+    assert not database.cursor().execute("SELECT DISTINCT * FROM requests "
+                                         "WHERE email = 'bob@123.ca' AND dropoff = 'cntr3'").fetchone()
+    shell.do_post_request("2018-12-31 west1 cntr3 1000")
+    assert database.cursor().execute("SELECT DISTINCT * FROM requests "
+                                     "WHERE email = 'bob@123.ca' AND dropoff = 'cntr3'").fetchone()
 
 
 def test_cancel_booking(mock_db):
@@ -144,18 +145,23 @@ def test_book_member(mock_db):
     database = sqlite3.connect(mock_db)
     shell = MiniProjectShell(database)
     shell.login("bob@123.ca", "foo")
+    assert database.cursor().execute("SELECT DISTINCT * FROM bookings "
+                                     "WHERE bno = 13").fetchone()
+    shell.do_cancel_booking("13")
+    assert not database.cursor().execute("SELECT DISTINCT * FROM bookings "
+                                         "WHERE bno = 13").fetchone()
 
 
-def test_list_bookings(mock_db):
-    database = sqlite3.connect(mock_db)
-    shell = MiniProjectShell(database)
-    shell.login("bob@123.ca", "foo")
+# def test_list_bookings(mock_db): TODO
+#     database = sqlite3.connect(mock_db)
+#     shell = MiniProjectShell(database)
+#     shell.login("bob@123.ca", "foo")
 
 
-def test_search_rides(mock_db):
-    database = sqlite3.connect(mock_db)
-    shell = MiniProjectShell(database)
-    shell.login("bob@123.ca", "foo")
+# def test_search_rides(mock_db): TODO
+#     database = sqlite3.connect(mock_db)
+#     shell = MiniProjectShell(database)
+#     shell.login("bob@123.ca", "foo")
 
 
 def test_offer_ride(mock_db):

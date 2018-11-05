@@ -358,7 +358,7 @@ class MiniProjectShell(cmd.Cmd):
             )
             to_delete = cur.fetchone()
 
-            if len(to_delete) == 0:
+            if not to_delete:
                 print("You don't have a booking where bno={}".format(args.bno))
                 print("Your bookings:")
                 self.do_list_bookings("")
@@ -474,7 +474,7 @@ class MiniProjectShell(cmd.Cmd):
             cur.execute(
                 'SELECT DISTINCT requests.* '
                 'FROM requests '
-                'WHERE pickup = ?',
+                'WHERE pickup like ?',
                 (args.lcode,)
             )
             rows = cur.fetchall()
