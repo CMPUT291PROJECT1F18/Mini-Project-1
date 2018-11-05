@@ -105,7 +105,7 @@ class MiniProjectShell(cmd.Cmd):
         get_logout_parser().print_help()
 
     def do_exit(self, arg):
-        """Logout (if needed) and exit out of the mini-project-1 shell: exit"""
+        """Logout (if needed) and exit out of the mini-project-1 shell"""
         if self.login_session:
             self.logout()
         __log__.info("exiting mini-project-1 shell")
