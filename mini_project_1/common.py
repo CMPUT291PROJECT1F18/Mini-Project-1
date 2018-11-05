@@ -113,3 +113,14 @@ def get_location_id(dbcursor: sqlite3.Cursor, keyword: str, prompt: str = None):
         return locations[0][0]
     else:
         raise ValueNotFoundException("No location for " + keyword)
+
+
+def send_message(database: sqlite3.Connection, recipient: str, sender: str, content: str, rno: int):
+    """"""
+    cur = database.cursor()
+
+    send_query = "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);"
+    cur.execute(send_query,
+                (recipient, pendulum.now().to_datetime_string(),
+                 sender, content, rno, "n"))
+    database.commit()

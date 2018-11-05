@@ -12,13 +12,15 @@ import pendulum
 
 from mini_project_1.cancel_booking import get_cancel_booking_parser
 from mini_project_1.common import ShellArgumentException, \
-    MINI_PROJECT_DATE_FMT
+    MINI_PROJECT_DATE_FMT, get_location_id, ValueNotFoundException, get_selection, send_message
 from mini_project_1.delete_ride_request import get_delete_ride_request_parser
 from mini_project_1.loginsession import LoginSession
+from mini_project_1.offer_ride import get_offer_ride_parser, check_valid_cno, offer_ride
 from mini_project_1.post_ride_request import get_post_ride_request_parser
 from mini_project_1.search_ride_requests import \
     get_search_ride_requests_by_city_name_parser, \
     get_search_ride_requests_by_location_code_parser
+from mini_project_1.search_rides import get_search_for_ride_parser
 from mini_project_1.select_ride_request import get_select_ride_request_parser
 
 __log__ = getLogger(__name__)
@@ -543,17 +545,6 @@ class MiniProjectShell(cmd.Cmd):
         if not locations:
             raise ShellArgumentException(
                 "invalid location code: {}".format(location_code_str))
-
-
-def send_message(database: sqlite3.Connection, recipient: str, sender: str, content: str, rno: int):
-    """"""
-    cur = database.cursor()
-
-    send_query = "INSERT INTO inbox VALUES (?, ?, ?, ?, ?, ?);"
-    cur.execute(send_query,
-                (recipient, pendulum.now().to_datetime_string(),
-                 sender, content, rno, "n"))
-    database.commit()
 
 
 def print_5_and_prompt(rows):
