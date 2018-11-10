@@ -54,7 +54,7 @@ setup(
     keywords="cmput291 project university",
     author="Nathan Klapstein, Ryan Furrer, Thomas Lorincz",
     author_email="nklapste@ualberta.ca",
-    url="https://github.com/CMPUT291PROJECT1F18/Mini-Project-1",
+    url="https://github.com/CMPUT291PROJECTF18/Mini-Project-1",
     license="MIT License",
     packages=find_packages(),
     include_package_data=True,
