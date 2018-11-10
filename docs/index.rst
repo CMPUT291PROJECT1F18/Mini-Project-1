@@ -3,7 +3,7 @@ Welcome to mini-project-1's documentation!
 
 This code is open source, and is `available on GitHub`_.
 
-.. _available on GitHub: https://github.com/CMPUT291PROJECT1F18/Mini-Project-1
+.. _available on GitHub: https://github.com/CMPUT291PROJECTF18/Mini-Project-1
 
 .. toctree::
    :maxdepth: 2
