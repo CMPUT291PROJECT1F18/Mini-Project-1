@@ -75,9 +75,9 @@ setup(
         ],
         "tests": [
             "mock>=2.0.0,<3.0.0",
-            "pytest",
-            "pytest-cov",
-            "pylint>=1.9.1,<2.0.0",
+            "pytest>=2.8.7,<4.0.0",
+            "pytest-cov<=2.6.0,<3.0.0",
+            "pylint>=1.9.3,<2.0.0",
         ]
     },
     classifiers=[
